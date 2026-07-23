@@ -1083,9 +1083,20 @@ app.post('/api/events', async (req, res) => {
   };
 
   db.events.push(newEvent);
+
+  // AUTOMATED BROADCAST NOTIFICATION FOR STUDENTS
+  if (!db.notifications) db.notifications = [];
+  db.notifications.unshift({
+    id: "notif-" + Math.random().toString(36).substr(2, 9),
+    type: "event",
+    title: `📣 New Event: ${title}`,
+    body: `${type} event announced by ${organizer}. Check the Events portal option to view poster and register!`,
+    created_at: new Date().toISOString()
+  });
+
   await writeDB(db);
 
-  // AUTOMATED BROADCAST TO PRINCIPAL AND ALL DEPARTMENT HODS
+  // AUTOMATED EMAIL BROADCAST TO PRINCIPAL AND ALL DEPARTMENT HODS
   const broadcastRecipients = [
     "principal@college.edu",
     "hod.cse@college.edu",

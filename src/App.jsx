@@ -1352,46 +1352,37 @@ export default function App() {
       })
       .catch(err => console.warn("Todos loading failed:", err));
 
-    // 3. Fetch all campus events
-    fetch(`${API_BASE}/events`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.events) {
-          setEventsList(data.events);
-        }
-      })
-      .catch(err => console.warn("Events loading failed:", err));
+    // Real-time synchronization polling for events, timetables, and syllabi
+    const syncPortalData = () => {
+      fetch(`${API_BASE}/events`)
+        .then(res => res.json())
+        .then(data => { if (data.events) setEventsList(data.events); })
+        .catch(err => console.warn("Events sync failed:", err));
 
-    // 4. Fetch master timetable for admin management
-    fetch(`${API_BASE}/timetable/all`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.timetable) {
-          setMasterTimetableList(data.timetable);
-        }
-      })
-      .catch(err => console.warn("Master timetable loading failed:", err));
+      fetch(`${API_BASE}/timetable/all`)
+        .then(res => res.json())
+        .then(data => { if (data.timetable) setMasterTimetableList(data.timetable); })
+        .catch(err => console.warn("Timetable sync failed:", err));
 
-    // 5. Fetch master syllabus for admin management & student view
-    fetch(`${API_BASE}/syllabus`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.syllabus) {
-          setMasterSyllabusList(data.syllabus);
-          setStudentSyllabusList(data.syllabus);
-        }
-      })
-      .catch(err => console.warn("Master syllabus loading failed:", err));
+      fetch(`${API_BASE}/syllabus`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.syllabus) {
+            setMasterSyllabusList(data.syllabus);
+            setStudentSyllabusList(data.syllabus);
+          }
+        })
+        .catch(err => console.warn("Syllabus sync failed:", err));
 
-    // 6. Fetch staff schedules
-    fetch(`${API_BASE}/staff-schedule`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.staff_schedules) {
-          setStaffScheduleList(data.staff_schedules);
-        }
-      })
-      .catch(err => console.warn("Staff schedules loading failed:", err));
+      fetch(`${API_BASE}/staff-schedule`)
+        .then(res => res.json())
+        .then(data => { if (data.staff_schedules) setStaffScheduleList(data.staff_schedules); })
+        .catch(err => console.warn("Staff schedules sync failed:", err));
+    };
+
+    syncPortalData();
+    const interval = setInterval(syncPortalData, 3000);
+    return () => clearInterval(interval);
   }, [user]);
 
   const getVisibleClubs = () => {
