@@ -1,0 +1,240 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #0b0f19;
+    color: #f1f5f9;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Glassmorphism styles */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 3D Perspective CSS Effect */
+.perspective-container {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.card-3d-tilt {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+  transform-style: preserve-3d;
+}
+
+.card-3d-tilt:hover {
+  transform: rotateX(4deg) rotateY(-4deg) translateZ(8px);
+  border-color: rgba(59, 130, 246, 0.35); /* brand blue */
+  box-shadow: 
+    -8px 8px 25px rgba(59, 130, 246, 0.15),
+    8px -8px 25px rgba(147, 51, 234, 0.15);
+}
+
+.depth-content {
+  transform: translateZ(20px);
+}
+
+/* Animated gradient backgrounds - Liquid glass & Iridescent Orbs */
+@keyframes liquid-drift {
+  0% { background-position: 0% 15%; }
+  50% { background-position: 100% 85%; }
+  100% { background-position: 0% 15%; }
+}
+
+.gradient-bg-mesh {
+  background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+  background-attachment: fixed;
+}
+
+.neon-glow-blue {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+}
+
+.neon-glow-purple {
+  box-shadow: 0 0 15px rgba(147, 51, 234, 0.4);
+}
+
+.text-glow-blue {
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.text-glow-purple {
+  text-shadow: 0 0 8px rgba(147, 51, 234, 0.5);
+}
+
+/* Hide scrollbar for clean dashboard layout */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 3D Tactile Buttons Styles */
+.btn-3d {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: 800;
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  user-select: none;
+}
+
+.btn-3d-purple {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  border: 1px solid #8b5cf6;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #4c1d95, 0 8px 15px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px) translateZ(10px);
+}
+.btn-3d-purple:hover {
+  transform: translateY(-6px) translateZ(15px);
+  box-shadow: 0 6px 0 #4c1d95, 0 12px 20px rgba(124, 58, 237, 0.35);
+}
+.btn-3d-purple:active {
+  transform: translateY(0px) translateZ(2px);
+  box-shadow: 0 0px 0 #4c1d95, 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-3d-sky {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  border: 1px solid #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #0369a1, 0 8px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px) translateZ(10px);
+}
+.btn-3d-sky:hover {
+  transform: translateY(-6px) translateZ(15px);
+  box-shadow: 0 6px 0 #0369a1, 0 12px 20px rgba(14, 165, 233, 0.25);
+}
+.btn-3d-sky:active {
+  transform: translateY(0px) translateZ(2px);
+  box-shadow: 0 0px 0 #0369a1, 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-3d-amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: 1px solid #fbbf24;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #b45309, 0 8px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px) translateZ(10px);
+}
+.btn-3d-amber:hover {
+  transform: translateY(-6px) translateZ(15px);
+  box-shadow: 0 6px 0 #b45309, 0 12px 20px rgba(245, 158, 11, 0.25);
+}
+.btn-3d-amber:active {
+  transform: translateY(0px) translateZ(2px);
+  box-shadow: 0 0px 0 #b45309, 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-3d-blue {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border: 1px solid #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #1e3a8a, 0 8px 15px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px) translateZ(10px);
+}
+.btn-3d-blue:hover {
+  transform: translateY(-6px) translateZ(15px);
+  box-shadow: 0 6px 0 #1e3a8a, 0 12px 20px rgba(37, 99, 235, 0.35);
+}
+.btn-3d-blue:active {
+  transform: translateY(0px) translateZ(2px);
+  box-shadow: 0 0px 0 #1e3a8a, 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-3d-emerald {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  border: 1px solid #10b981;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #064e3b, 0 8px 15px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px) translateZ(10px);
+}
+.btn-3d-emerald:hover {
+  transform: translateY(-6px) translateZ(15px);
+  box-shadow: 0 6px 0 #064e3b, 0 12px 20px rgba(5, 150, 105, 0.35);
+}
+.btn-3d-emerald:active {
+  transform: translateY(0px) translateZ(2px);
+  box-shadow: 0 0px 0 #064e3b, 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-3d-rose {
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  border: 1px solid #f43f5e;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #4c0519, 0 8px 15px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px) translateZ(10px);
+}
+.btn-3d-rose:hover {
+  transform: translateY(-6px) translateZ(15px);
+  box-shadow: 0 6px 0 #4c0519, 0 12px 20px rgba(225, 29, 72, 0.35);
+}
+.btn-3d-rose:active {
+  transform: translateY(0px) translateZ(2px);
+  box-shadow: 0 0px 0 #4c0519, 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-3d-slate {
+  background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  border: 1px solid #475569;
+  color: #e2e8f0;
+  box-shadow: 0 4px 0 #0f172a, 0 8px 15px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px) translateZ(10px);
+}
+.btn-3d-slate:hover {
+  transform: translateY(-6px) translateZ(15px);
+  box-shadow: 0 6px 0 #0f172a, 0 12px 20px rgba(71, 85, 105, 0.3);
+}
+.btn-3d-slate:active {
+  transform: translateY(0px) translateZ(2px);
+  box-shadow: 0 0px 0 #0f172a, 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Floating Cosmic Orbs Animation */
+@keyframes float-slow {
+  0% { transform: translateY(0px) scale(1) rotate(0deg); filter: hue-rotate(0deg); }
+  50% { transform: translateY(-30px) scale(1.1) rotate(180deg); filter: hue-rotate(45deg); }
+  100% { transform: translateY(0px) scale(1) rotate(360deg); filter: hue-rotate(0deg); }
+}
+
+.cosmic-orb-1 {
+  animation: float-slow 25s infinite alternate ease-in-out;
+}
+.cosmic-orb-2 {
+  animation: float-slow 35s infinite alternate-reverse ease-in-out;
+}
+
+/* Creative Motion Tab transitions */
+@keyframes tab-slide-in {
+  0% { opacity: 0; transform: translateY(16px) scale(0.985); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.tab-transition {
+  animation: tab-slide-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+
+

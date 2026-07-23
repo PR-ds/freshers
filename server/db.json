@@ -1,0 +1,369 @@
+{
+  "users": [
+    {
+      "id": "u-eygpqq712",
+      "college_email": "backupuser001@gmail.com",
+      "full_name": "BACKUPUSER001",
+      "batch_no": "288084",
+      "department": "Artificial Intelligence and Data Science (AI&DS B.Tech)",
+      "roll_no": "2026ART572",
+      "onboarding_completed": true,
+      "academic_interests": [
+        "Coding Society",
+        "Web Development"
+      ],
+      "domain_track": "Software Engineering",
+      "learning_style": "Visual & Hands-on",
+      "weekly_summary_cached": "",
+      "created_at": "2026-07-20T00:34:43.815Z"
+    },
+    {
+      "id": "u-kxspjhyoa",
+      "college_email": "student@college.edu",
+      "full_name": "Alex Morgan",
+      "batch_no": "2026-CS",
+      "department": "Computer Science Engineering (CSE B.E)",
+      "roll_no": "2026ART965",
+      "onboarding_completed": true,
+      "academic_interests": [
+        "Coding Society",
+        "Web Development"
+      ],
+      "domain_track": "Software Engineering",
+      "learning_style": "Visual & Hands-on",
+      "weekly_summary_cached": "",
+      "created_at": "2026-07-20T00:36:09.938Z"
+    },
+    {
+      "id": "u-3528nex7w",
+      "college_email": "student@gmail.com",
+      "full_name": "STUDENT",
+      "batch_no": "288077",
+      "department": "Artificial Intelligence and Data Science (AI&DS B.Tech)",
+      "roll_no": "2026ART946",
+      "onboarding_completed": true,
+      "academic_interests": [
+        "Coding Society",
+        "Web Development"
+      ],
+      "domain_track": "Software Engineering",
+      "learning_style": "Visual & Hands-on",
+      "weekly_summary_cached": "",
+      "created_at": "2026-07-21T18:02:36.317Z"
+    },
+    {
+      "id": "admin-tzawvz92c",
+      "college_email": "staff@college.edu",
+      "full_name": "Dr. A. K. Sharma",
+      "is_admin": true,
+      "department": "Academic Administration",
+      "onboarding_completed": true,
+      "created_at": "2026-07-21T18:03:10.432Z",
+      "degree_completion": "Ph.D in Computer Science & Engineering (M.E/M.Tech)",
+      "experience": "14+ Years Senior Professor & Department Chair"
+    },
+    {
+      "id": "u-ep1fjy1kz",
+      "college_email": "harirudhra08@gmail.com",
+      "full_name": "Oviya A",
+      "batch_no": "288067",
+      "department": "Artificial Intelligence and Data Science (AI&DS B.Tech)",
+      "roll_no": "2026ART364",
+      "onboarding_completed": true,
+      "academic_interests": [
+        "Coding Society",
+        "Web Development"
+      ],
+      "domain_track": "Software Engineering",
+      "learning_style": "Visual & Hands-on",
+      "weekly_summary_cached": "",
+      "created_at": "2026-07-23T07:26:57.367Z"
+    }
+  ],
+  "onboarding_chats": {},
+  "mentor_chats": {
+    "u-kxspjhyoa": [
+      {
+        "role": "user",
+        "message_content": "hi "
+      },
+      {
+        "role": "model",
+        "message_content": "This is a pre-cached response from the portal assistant."
+      },
+      {
+        "role": "user",
+        "message_content": "im intereseted in data scinec"
+      },
+      {
+        "role": "model",
+        "message_content": "This is a pre-cached response from the portal assistant."
+      }
+    ]
+  },
+  "timetable": [
+    {
+      "id": "tt-oqygmmuid",
+      "department": "Artificial Intelligence & Data Science (AI & DS)",
+      "year": "3rd Year",
+      "batch_no": "3rd Year-Artificial Intelligence & Data Science (AI & DS)",
+      "day_of_week": "Monday",
+      "subject_name": "buiibvu",
+      "time_start": "09:00 AM",
+      "time_end": "09:45 AM",
+      "classroom": "LH-101",
+      "building": "Academic Block A",
+      "faculty": "koj"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quiz-1",
+      "title": "CS Freshers - Logic & SQL basics",
+      "questions": [
+        {
+          "question_id": "q1",
+          "text": "Which SQL clause is used to filter query results based on aggregate values?",
+          "options": [
+            "WHERE",
+            "HAVING",
+            "GROUP BY",
+            "ORDER BY"
+          ],
+          "correct_option_idx": 1
+        },
+        {
+          "question_id": "q2",
+          "text": "What is the time complexity of searching in a balanced Binary Search Tree (BST)?",
+          "options": [
+            "O(1)",
+            "O(n)",
+            "O(log n)",
+            "O(n log n)"
+          ],
+          "correct_option_idx": 2
+        },
+        {
+          "question_id": "q3",
+          "text": "What does the 'S' in SOLID principles stand for?",
+          "options": [
+            "Single Responsibility",
+            "Structural Dependency",
+            "Stack Allocation",
+            "System Integrity"
+          ],
+          "correct_option_idx": 0
+        }
+      ]
+    }
+  ],
+  "attempts": [],
+  "friends": [],
+  "messages": [],
+  "notifications": [],
+  "events": [
+    {
+      "id": "ev-1",
+      "type": "Hackathon",
+      "title": "Prism Hack 2026: 3D Frontend Challenge",
+      "description": "Design fluid interactive 3D WebGL interfaces using Three.js and custom shaders. Organized by the CSE Coding Society.",
+      "organizer": "CSE Dept",
+      "date_string": "Ongoing (Ends in 4 hrs)",
+      "is_ongoing": true,
+      "registration_link": ""
+    },
+    {
+      "id": "ev-2",
+      "type": "Symposium",
+      "title": "Robotics & IoT Showcase",
+      "description": "Live demonstration of autonomous hardware models and STM32 sensor relays. Organized by ECE Dept.",
+      "organizer": "ECE Dept",
+      "date_string": "Ongoing (Live Session)",
+      "is_ongoing": true,
+      "registration_link": ""
+    },
+    {
+      "id": "ev-3",
+      "type": "Workshop",
+      "title": "Web3 Smart Contracts & Auditing",
+      "description": "Learn Solidity compile patterns and test smart contract vulnerabilities. Organized by CSBS Dept.",
+      "organizer": "CSBS Dept",
+      "date_string": "July 25",
+      "is_ongoing": false,
+      "registration_link": "https://ethereum.org"
+    }
+  ],
+  "syllabus": [
+    {
+      "id": "syl-cse-1",
+      "department": "Computer Science Engineering (CSE B.E)",
+      "year": "1st Year",
+      "subject_code": "CS101",
+      "subject_name": "Problem Solving & Data Structures",
+      "credits": 4,
+      "category": "Core Engineering",
+      "units": [
+        "Unit 1: Computational Logic, Flowcharts & C Fundamentals",
+        "Unit 2: Dynamic Memory Allocation, Pointers & Array Math",
+        "Unit 3: Stack, Queue Implementations & Linked List Operations",
+        "Unit 4: Binary Trees, BST Traversals & Heaps",
+        "Unit 5: Graph Theory, Dijkstra Algorithm & Hashing Techniques"
+      ],
+      "reference_links": [
+        "https://mitopencourseware.com",
+        "https://freecodecamp.org"
+      ]
+    },
+    {
+      "id": "syl-cse-2",
+      "department": "Computer Science Engineering (CSE B.E)",
+      "year": "2nd Year",
+      "subject_code": "CS201",
+      "subject_name": "Database Management Systems (DBMS)",
+      "credits": 4,
+      "category": "Core Engineering",
+      "units": [
+        "Unit 1: Relational Algebra & ER Modeling",
+        "Unit 2: SQL DDL, DML, Joins & Subqueries",
+        "Unit 3: Normalization (1NF to BCNF) & Functional Dependencies",
+        "Unit 4: Transaction Processing, ACID Properties & Concurrency Control",
+        "Unit 5: B-Trees, Indexing & NoSQL Architectures"
+      ],
+      "reference_links": [
+        "https://w3schools.com/sql",
+        "https://youtube.com"
+      ]
+    },
+    {
+      "id": "syl-aids-1",
+      "department": "Artificial Intelligence & Data Science (AI & DS)",
+      "year": "1st Year",
+      "subject_code": "AD101",
+      "subject_name": "Foundations of Artificial Intelligence",
+      "credits": 4,
+      "category": "Core AI",
+      "units": [
+        "Unit 1: Intelligent Agents & Problem Spaces",
+        "Unit 2: Heuristic Search Strategies (A*, Minimax, Alpha-Beta)",
+        "Unit 3: Knowledge Representation & First-Order Logic",
+        "Unit 4: Probabilistic Reasoning & Bayesian Networks",
+        "Unit 5: Introduction to Neural Networks & Reinforcement Learning"
+      ],
+      "reference_links": [
+        "https://ai.stanford.edu",
+        "https://deeplearning.ai"
+      ]
+    },
+    {
+      "id": "syl-ece-1",
+      "department": "Electronics & Communication (ECE)",
+      "year": "1st Year",
+      "subject_code": "EC101",
+      "subject_name": "Digital Electronics & Signals",
+      "credits": 4,
+      "category": "Core Circuits",
+      "units": [
+        "Unit 1: Boolean Algebra & Logic Gate Networks",
+        "Unit 2: Combinational Logic (Multiplexers, Decoders, Adders)",
+        "Unit 3: Sequential Logic (Flip-Flops, Counters, Shift Registers)",
+        "Unit 4: Continuous vs Discrete Signals & Fourier Transforms",
+        "Unit 5: Microcontroller Architecture (8051 & STM32 Basics)"
+      ],
+      "reference_links": [
+        "https://nptel.ac.in"
+      ]
+    }
+  ],
+  "staff_schedules": [
+    {
+      "id": "staff-sc-1",
+      "staff_name": "Dr. A. K. Sharma",
+      "designation": "Senior Professor & HOD",
+      "department": "Computer Science Engineering (CSE B.E)",
+      "available_hours": "Mon, Wed, Fri: 10:00 AM - 12:30 PM",
+      "schedule_image_url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop",
+      "assigned_subjects": "Data Structures, Database Architectures"
+    },
+    {
+      "id": "staff-sc-2",
+      "staff_name": "Prof. Priya Sen",
+      "designation": "Associate Professor",
+      "department": "Artificial Intelligence & Data Science (AI & DS)",
+      "available_hours": "Tue, Thu: 02:00 PM - 04:30 PM",
+      "schedule_image_url": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop",
+      "assigned_subjects": "Machine Learning, Neural Networks"
+    }
+  ],
+  "student_login_logs": [
+    {
+      "id": "log-3nglpfyrj",
+      "student_id": "u-kxspjhyoa",
+      "student_name": "manae",
+      "college_email": "student@college.edu",
+      "batch_no": "288084",
+      "department": "Artificial Intelligence and Data Science (AI&DS B.Tech)",
+      "login_timestamp": "2026-07-23T13:50:36.446Z",
+      "ip_address": "::1"
+    },
+    {
+      "id": "log-l2835pgzw",
+      "student_id": "u-kxspjhyoa",
+      "student_name": "vavae",
+      "college_email": "student@college.edu",
+      "batch_no": "288085",
+      "department": "Artificial Intelligence and Data Science (AI&DS B.Tech)",
+      "login_timestamp": "2026-07-23T13:54:28.039Z",
+      "ip_address": "::1"
+    },
+    {
+      "id": "log-pwx3ikdzo",
+      "student_id": "u-kxspjhyoa",
+      "student_name": "Alex Morgan",
+      "college_email": "student@college.edu",
+      "batch_no": "2026-CS",
+      "department": "Computer Science Engineering (CSE B.E)",
+      "login_timestamp": "2026-07-23T14:10:25.850Z",
+      "ip_address": "::1"
+    }
+  ],
+  "student_progress": {
+    "u-kxspjhyoa": {
+      "student_id": "u-kxspjhyoa",
+      "registered_events": [],
+      "completed_todos": [],
+      "quiz_attempts": [],
+      "enrolled_skill_tracks": [],
+      "diagnostic_roadmap": null,
+      "created_at": "2026-07-23T13:50:36.460Z"
+    }
+  },
+  "registrations": [
+    {
+      "id": "reg-m5kjarc0n",
+      "event_id": "ev-1",
+      "team_name": "snstr",
+      "members": [
+        {
+          "name": "Alex Morgan",
+          "class_section": "Computer Science Engineering (CSE B.E)",
+          "batch_no": "2026-CS",
+          "email": "student@college.edu"
+        },
+        {
+          "name": "sbsr",
+          "class_section": "sds",
+          "batch_no": "36463",
+          "email": "rerhre@gmail.com"
+        },
+        {
+          "name": "arehr",
+          "class_section": "ehh",
+          "batch_no": "3463",
+          "email": "gaehaer@gmail.com"
+        }
+      ],
+      "google_doc_url": "https://docs.google.com/document/d/1O7VC6KLIYEL/edit?usp=sharing",
+      "created_at": "2026-07-23T14:25:56.293Z"
+    }
+  ]
+}
