@@ -609,6 +609,18 @@ app.get('/api/timetable/all', async (req, res) => {
   res.json({ timetable: db.timetable || [] });
 });
 
+// Department HOD Email Resolver
+const getDepartmentHODEmail = (deptName) => {
+  const lower = (deptName || "").toLowerCase();
+  if (lower.includes("cse") || lower.includes("computer science engineering")) return "hod.cse@college.edu";
+  if (lower.includes("ai") || lower.includes("data science") || lower.includes("aids")) return "hod.aids@college.edu";
+  if (lower.includes("ece") || lower.includes("electronics")) return "hod.ece@college.edu";
+  if (lower.includes("csbs") || lower.includes("business systems")) return "hod.csbs@college.edu";
+  if (lower.includes("mech") || lower.includes("mechanical")) return "hod.mech@college.edu";
+  if (lower.includes("civil")) return "hod.civil@college.edu";
+  return "hod.general@college.edu";
+};
+
 app.post('/api/timetable/manage', async (req, res) => {
   const { id, department, year, batch_no, day_of_week, subject_name, time_start, time_end, classroom, building, faculty, timetable_image_url } = req.body;
 
@@ -617,6 +629,7 @@ app.post('/api/timetable/manage', async (req, res) => {
 
   const targetBatch = batch_no || `${year || '1st Year'}-${department || 'General'}`;
 
+  let targetSlot;
   if (id) {
     const idx = db.timetable.findIndex(t => t.id === id);
     if (idx !== -1) {
@@ -634,30 +647,50 @@ app.post('/api/timetable/manage', async (req, res) => {
         faculty: faculty || "Faculty",
         timetable_image_url: timetable_image_url || db.timetable[idx].timetable_image_url
       };
-      await writeDB(db);
-      return res.json({ success: true, slot: db.timetable[idx] });
+      targetSlot = db.timetable[idx];
     }
   }
 
-  const newSlot = {
-    id: "tt-" + Math.random().toString(36).substr(2, 9),
-    department: department || "Computer Science Engineering (CSE B.E)",
-    year: year || "1st Year",
-    batch_no: targetBatch,
-    day_of_week: day_of_week || "Monday",
-    subject_name: subject_name || "Department Timetable Chart",
-    time_start: time_start || "09:00 AM",
-    time_end: time_end || "10:00 AM",
-    classroom: classroom || "LH-101",
-    building: building || "Academic Block A",
-    faculty: faculty || "Faculty",
-    timetable_image_url: timetable_image_url || "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop",
-    created_at: new Date().toISOString()
-  };
+  if (!targetSlot) {
+    targetSlot = {
+      id: "tt-" + Math.random().toString(36).substr(2, 9),
+      department: department || "Computer Science Engineering (CSE B.E)",
+      year: year || "1st Year",
+      batch_no: targetBatch,
+      day_of_week: day_of_week || "Monday",
+      subject_name: subject_name || "Department Timetable Chart",
+      time_start: time_start || "09:00 AM",
+      time_end: time_end || "10:00 AM",
+      classroom: classroom || "LH-101",
+      building: building || "Academic Block A",
+      faculty: faculty || "Faculty",
+      timetable_image_url: timetable_image_url || "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop",
+      created_at: new Date().toISOString()
+    };
+    db.timetable.push(targetSlot);
+  }
 
-  db.timetable.push(newSlot);
+  // Push System Broadcast Notification for Students
+  if (!db.notifications) db.notifications = [];
+  db.notifications.unshift({
+    id: "notif-" + Math.random().toString(36).substr(2, 9),
+    type: "academic",
+    title: `📅 Timetable Update: ${targetSlot.department}`,
+    body: `New ${targetSlot.year} Class Timetable chart published for ${targetSlot.department}. Check your Class Timetable option!`,
+    created_at: new Date().toISOString()
+  });
+
   await writeDB(db);
-  res.json({ success: true, slot: newSlot });
+
+  // Email Notification to Principal and Department HOD
+  const hodEmail = getDepartmentHODEmail(targetSlot.department);
+  const emailSubject = `[OFFICIAL TIMETABLE ANNOUNCEMENT] Class Timetable Published: ${targetSlot.department} (${targetSlot.year})`;
+  const emailBody = `Dear Principal & HOD,\n\nOfficial Class Timetable update published by Admin.\n\nDepartment: ${targetSlot.department}\nAcademic Year: ${targetSlot.year}\nTimetable Chart Image: ${targetSlot.timetable_image_url || 'Attached'}\n\nThis timetable image has been automatically synced to all students in ${targetSlot.department}.`;
+
+  sendEmailNotification("principal@college.edu", emailSubject, emailBody).catch(err => console.error("Principal email fail:", err));
+  sendEmailNotification(hodEmail, emailSubject, emailBody).catch(err => console.error("HOD email fail:", err));
+
+  res.json({ success: true, slot: targetSlot });
 });
 
 app.post('/api/timetable/delete', async (req, res) => {
@@ -726,7 +759,27 @@ app.post('/api/staff-schedule', async (req, res) => {
   };
 
   db.staff_schedules.push(newSchedule);
+
+  // Push System Broadcast Notification for Students
+  if (!db.notifications) db.notifications = [];
+  db.notifications.unshift({
+    id: "notif-" + Math.random().toString(36).substr(2, 9),
+    type: "academic",
+    title: `👨‍🏫 Staff Schedule Update: ${newSchedule.department}`,
+    body: `Faculty schedule & office hours updated for ${newSchedule.staff_name} (${newSchedule.department}).`,
+    created_at: new Date().toISOString()
+  });
+
   await writeDB(db);
+
+  // Email Notification to Principal and Department HOD
+  const hodEmail = getDepartmentHODEmail(newSchedule.department);
+  const emailSubject = `[STAFF SCHEDULE ANNOUNCEMENT] Faculty Schedule Updated: ${newSchedule.staff_name} (${newSchedule.department})`;
+  const emailBody = `Dear Principal & HOD,\n\nFaculty schedule and office hours updated by Admin.\n\nFaculty Name: ${newSchedule.staff_name}\nDesignation: ${newSchedule.designation}\nDepartment: ${newSchedule.department}\nAvailable Hours: ${newSchedule.available_hours}\nAssigned Subjects: ${newSchedule.assigned_subjects}\nSchedule Image: ${newSchedule.schedule_image_url || 'Attached'}\n\nThis schedule record has been automatically synced to all students in ${newSchedule.department}.`;
+
+  sendEmailNotification("principal@college.edu", emailSubject, emailBody).catch(err => console.error("Principal email fail:", err));
+  sendEmailNotification(hodEmail, emailSubject, emailBody).catch(err => console.error("HOD email fail:", err));
+
   res.json({ success: true, staff_schedule: newSchedule });
 });
 
@@ -894,6 +947,7 @@ app.post('/api/syllabus/manage', async (req, res) => {
   const db = await readDB();
   if (!db.syllabus) db.syllabus = defaultSyllabusSeed;
 
+  let targetSubject;
   if (id) {
     const idx = db.syllabus.findIndex(s => s.id === id);
     if (idx !== -1) {
@@ -909,33 +963,53 @@ app.post('/api/syllabus/manage', async (req, res) => {
         reference_links: reference_links || db.syllabus[idx].reference_links,
         syllabus_image_url: syllabus_image_url || db.syllabus[idx].syllabus_image_url
       };
-      await writeDB(db);
-      return res.json({ success: true, subject: db.syllabus[idx] });
+      targetSubject = db.syllabus[idx];
     }
   }
 
-  const newSubject = {
-    id: "syl-" + Math.random().toString(36).substr(2, 9),
-    department,
-    year,
-    subject_code: subject_code || `SUB${Math.floor(100 + Math.random() * 900)}`,
-    subject_name: subject_name || "Official Course Curriculum & Syllabus Diagram",
-    credits: credits || 4,
-    category: category || "Core",
-    syllabus_image_url: syllabus_image_url || "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&auto=format&fit=crop",
-    units: units || [
-      "Unit 1: Computational Logic & Fundamentals",
-      "Unit 2: Dynamic Memory Allocation & Algorithms",
-      "Unit 3: Data Structures & Core Operations",
-      "Unit 4: Advanced Systems & Trees",
-      "Unit 5: Real-World Case Studies & Industry Applications"
-    ],
-    reference_links: reference_links || []
-  };
+  if (!targetSubject) {
+    targetSubject = {
+      id: "syl-" + Math.random().toString(36).substr(2, 9),
+      department,
+      year,
+      subject_code: subject_code || `SUB${Math.floor(100 + Math.random() * 900)}`,
+      subject_name: subject_name || "Official Course Curriculum & Syllabus Diagram",
+      credits: credits || 4,
+      category: category || "Core",
+      syllabus_image_url: syllabus_image_url || "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&auto=format&fit=crop",
+      units: units || [
+        "Unit 1: Computational Logic & Fundamentals",
+        "Unit 2: Dynamic Memory Allocation & Algorithms",
+        "Unit 3: Data Structures & Core Operations",
+        "Unit 4: Advanced Systems & Trees",
+        "Unit 5: Real-World Case Studies & Industry Applications"
+      ],
+      reference_links: reference_links || []
+    };
+    db.syllabus.push(targetSubject);
+  }
 
-  db.syllabus.push(newSubject);
+  // Push System Broadcast Notification for Students
+  if (!db.notifications) db.notifications = [];
+  db.notifications.unshift({
+    id: "notif-" + Math.random().toString(36).substr(2, 9),
+    type: "academic",
+    title: `📚 Syllabus Update: ${targetSubject.subject_name}`,
+    body: `New Subject & Syllabus curriculum published for ${targetSubject.department} (${targetSubject.year}). Check Academics option!`,
+    created_at: new Date().toISOString()
+  });
+
   await writeDB(db);
-  res.json({ success: true, subject: newSubject });
+
+  // Email Notification to Principal and Department HOD
+  const hodEmail = getDepartmentHODEmail(targetSubject.department);
+  const emailSubject = `[OFFICIAL SYLLABUS ANNOUNCEMENT] Subject & Syllabus Published: ${targetSubject.subject_name} (${targetSubject.department})`;
+  const emailBody = `Dear Principal & HOD,\n\nOfficial Course Syllabus & Subject update published by Admin.\n\nSubject Code: ${targetSubject.subject_code}\nSubject Title: ${targetSubject.subject_name}\nDepartment: ${targetSubject.department}\nAcademic Year: ${targetSubject.year}\nSyllabus Document Image: ${targetSubject.syllabus_image_url || 'Attached'}\n\nThis subject and syllabus record has been automatically synced to all students in ${targetSubject.department}.`;
+
+  sendEmailNotification("principal@college.edu", emailSubject, emailBody).catch(err => console.error("Principal email fail:", err));
+  sendEmailNotification(hodEmail, emailSubject, emailBody).catch(err => console.error("HOD email fail:", err));
+
+  res.json({ success: true, subject: targetSubject });
 });
 
 app.post('/api/syllabus/delete', async (req, res) => {
