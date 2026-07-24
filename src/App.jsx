@@ -2695,33 +2695,34 @@ export default function App() {
 
 
       {/* HEADER NAVBAR */}
-      <header className="sticky top-0 z-30 glass-panel border-b border-white/5 py-4 px-6 md:px-12 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-brand-600 flex justify-center items-center neon-glow-blue">
-            <Sparkles className="w-5 h-5 text-white" />
+      <header className="sticky top-0 z-30 glass-panel border-b border-white/5 py-3 sm:py-4 px-4 sm:px-8 md:px-12 flex justify-between items-center flex-wrap gap-2">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-brand-600 flex justify-center items-center neon-glow-blue shrink-0">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
-          <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent text-glow-blue">
+          <span className="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent text-glow-blue">
             ADAPTIFY
           </span>
-          <span className="text-[10px] bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded border border-brand-500/30 uppercase font-mono font-bold">
+          <span className="hidden sm:inline-block text-[9px] sm:text-[10px] bg-brand-500/20 text-brand-400 px-2 py-0.5 rounded border border-brand-500/30 uppercase font-mono font-bold">
             College Freshers
           </span>
         </div>
 
         {user && (
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
             {offlineMode && (
-              <span className="text-[10px] bg-amber-500/25 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full font-mono font-bold animate-pulse">
+              <span className="hidden md:inline-block text-[10px] bg-amber-500/25 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full font-mono font-bold animate-pulse">
                 ⚡ Static Web Mode
               </span>
             )}
-            <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">
-              <User className="w-4 h-4 text-brand-400" />
-              <span className="text-sm font-semibold text-slate-200">{user.full_name}</span>
+            <div className="flex items-center gap-2 sm:gap-3 bg-white/5 border border-white/10 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full">
+              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-400 shrink-0" />
+              <span className="text-xs sm:text-sm font-semibold text-slate-200 truncate max-w-[100px] sm:max-w-none">{user.full_name}</span>
             </div>
             <button 
               onClick={handleLogout}
-              className="text-slate-400 hover:text-white p-2 hover:bg-white/5 rounded-full transition-all"
+              className="text-slate-400 hover:text-white p-1.5 sm:p-2 hover:bg-white/5 rounded-full transition-all cursor-pointer"
+              title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -2890,15 +2891,15 @@ export default function App() {
                   onClick={() => setActiveTab('profile')} 
                 />
 
-                <div className="w-full pt-4 flex flex-col gap-3">
+                <div className="w-full pt-4 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 sm:gap-3 pb-2 lg:pb-0 no-scrollbar">
                   {user.is_admin ? (
                     <>
                       <button 
                         onClick={() => setActiveTab('dashboard')}
                         className={
                           activeTab === 'dashboard' 
-                            ? 'btn-3d btn-3d-sky w-full flex items-center justify-start gap-3 px-4 py-3 text-xs font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-sky shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <Layers className="w-4 h-4 text-sky-400" />
@@ -2909,8 +2910,8 @@ export default function App() {
                         onClick={() => { setActiveTab('event_management'); setAdminSubTab('events'); }}
                         className={
                           activeTab === 'event_management' 
-                            ? 'btn-3d btn-3d-rose w-full flex items-center justify-start gap-3 px-4 py-3 text-xs font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-rose shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <Calendar className="w-4 h-4 text-rose-400" />
@@ -2921,8 +2922,8 @@ export default function App() {
                         onClick={() => { setActiveTab('admin_timetables'); setAdminSubTab('timetables'); }}
                         className={
                           activeTab === 'admin_timetables' 
-                            ? 'btn-3d btn-3d-blue w-full flex items-center justify-start gap-3 px-4 py-3 text-xs font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-blue shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <Clock className="w-4 h-4 text-cyan-400" />
@@ -2933,8 +2934,8 @@ export default function App() {
                         onClick={() => { setActiveTab('admin_staff'); setAdminSubTab('staff_schedules'); }}
                         className={
                           activeTab === 'admin_staff' 
-                            ? 'btn-3d btn-3d-amber w-full flex items-center justify-start gap-3 px-4 py-3 text-xs font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-amber shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <UserCheck className="w-4 h-4 text-amber-400" />
@@ -2945,8 +2946,8 @@ export default function App() {
                         onClick={() => { setActiveTab('admin_syllabus'); setAdminSubTab('syllabus'); }}
                         className={
                           activeTab === 'admin_syllabus' 
-                            ? 'btn-3d btn-3d-emerald w-full flex items-center justify-start gap-3 px-4 py-3 text-xs font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-emerald shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <BookOpen className="w-4 h-4 text-emerald-400" />
@@ -2957,8 +2958,8 @@ export default function App() {
                         onClick={() => setActiveTab('profile')}
                         className={
                           activeTab === 'profile' 
-                            ? 'btn-3d btn-3d-purple w-full flex items-center justify-start gap-3 px-4 py-3 text-xs font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-start gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-purple shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-start gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <User className="w-4 h-4 text-purple-400" />
@@ -2971,8 +2972,8 @@ export default function App() {
                         onClick={() => setActiveTab('dashboard')}
                         className={
                           activeTab === 'dashboard' 
-                            ? 'btn-3d btn-3d-sky w-full flex items-center justify-center gap-3 px-4 py-3 text-sm font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-sky shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <Layers className="w-4 h-4" />
@@ -2983,8 +2984,8 @@ export default function App() {
                         onClick={() => setActiveTab('academics')}
                         className={
                           activeTab === 'academics' 
-                            ? 'btn-3d btn-3d-emerald w-full flex items-center justify-center gap-3 px-4 py-3 text-sm font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-emerald shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <BookOpen className="w-4 h-4" />
@@ -2995,8 +2996,8 @@ export default function App() {
                         onClick={() => setActiveTab('skills')}
                         className={
                           activeTab === 'skills' 
-                            ? 'btn-3d btn-3d-amber w-full flex items-center justify-center gap-3 px-4 py-3 text-sm font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-amber shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <BookOpenCheck className="w-4 h-4" />
@@ -3007,8 +3008,8 @@ export default function App() {
                         onClick={() => setActiveTab('events')}
                         className={
                           activeTab === 'events' 
-                            ? 'btn-3d btn-3d-rose w-full flex items-center justify-center gap-3 px-4 py-3 text-sm font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-rose shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <Calendar className="w-4 h-4" />
@@ -3019,8 +3020,8 @@ export default function App() {
                         onClick={() => setActiveTab('profile')}
                         className={
                           activeTab === 'profile' 
-                            ? 'btn-3d btn-3d-purple w-full flex items-center justify-center gap-3 px-4 py-3 text-sm font-bold text-white cursor-pointer' 
-                            : 'flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
+                            ? 'btn-3d btn-3d-purple shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-white cursor-pointer' 
+                            : 'shrink-0 flex items-center justify-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold transition-all border border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200 cursor-pointer'
                         }
                       >
                         <User className="w-4 h-4" />
@@ -5259,11 +5260,11 @@ export default function App() {
 
       {/* FLOATING AI ASSISTANT WIDGET (Flipkart/Amazon style) */}
       {user && (
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end max-w-[calc(100vw-2rem)]">
           
           {/* Chat Window Container */}
           {isAiWidgetOpen && (
-            <div className="w-[360px] h-[480px] mb-4 glass-panel border border-white/10 rounded-2xl flex flex-col shadow-2xl overflow-hidden transition-all duration-300 transform origin-bottom-right scale-100 opacity-100 backdrop-blur-md">
+            <div className="w-[calc(100vw-2rem)] sm:w-[360px] h-[75vh] sm:h-[480px] max-h-[500px] mb-4 glass-panel border border-white/10 rounded-2xl flex flex-col shadow-2xl overflow-hidden transition-all duration-300 transform origin-bottom-right scale-100 opacity-100 backdrop-blur-md">
               {/* Header */}
               <div className="p-4 bg-gradient-to-r from-purple-600 to-indigo-600 flex justify-between items-center text-white shrink-0">
                 <div className="flex items-center gap-2">
