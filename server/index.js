@@ -7,6 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Storage } from '@google-cloud/storage';
 
+import { createClient } from '@supabase/supabase-js';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,13 +17,47 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Supabase Realtime Database Client Initialization
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://xyzcompany.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy';
+
+let supabaseClient = null;
+if (process.env.SUPABASE_URL && (process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)) {
+  try {
+    supabaseClient = createClient(supabaseUrl, supabaseKey);
+    console.log("⚡ Supabase Realtime Cloud Database Client active and connected.");
+  } catch (err) {
+    console.warn("⚠️ Supabase Client init failed, using persistent storage fallback.", err.message);
+  }
+} else {
+  console.log("ℹ️ Supabase credentials not set in env. Local persistent emulator active.");
+}
+
 // Enable CORS and JSON parser with 50mb payload limit for Base64 DataURLs
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Mock DB File Path (for local sandbox fallback)
+// Mock DB File Path (for persistent fallback)
 const DB_FILE = path.join(__dirname, 'db.json');
+
+// Incident & Activity Logger Helper
+const logIncident = async (db, incidentType, title, description, performedBy) => {
+  if (!db.incidents) db.incidents = [];
+  const incidentEntry = {
+    id: "inc-" + Math.random().toString(36).substr(2, 9),
+    type: incidentType,
+    title,
+    description,
+    performed_by: performedBy || "System",
+    timestamp: new Date().toISOString()
+  };
+  db.incidents.unshift(incidentEntry);
+
+  if (supabaseClient) {
+    supabaseClient.from('incidents').insert([incidentEntry]).then().catch(err => console.warn("Supabase incident sync:", err.message));
+  }
+};
 
 // Initialize Mock Database if not exists
 if (!fs.existsSync(DB_FILE)) {
@@ -309,19 +345,43 @@ app.post('/api/auth/sso/login', async (req, res) => {
     ).catch(err => console.error("SSO login alert email fail:", err));
   }
 
-  // Record Student Login Audit Log
-  if (!db.student_login_logs) db.student_login_logs = [];
-  const loginLogEntry = {
-    id: "log-" + Math.random().toString(36).substr(2, 9),
-    student_id: user.id,
-    student_name: user.full_name,
-    college_email: user.college_email,
-    batch_no: user.batch_no || batch_no || "2026-CS",
-    department: user.department || department || "Computer Science",
-    login_timestamp: new Date().toISOString(),
-    ip_address: req.ip || "127.0.0.1"
-  };
-  db.student_login_logs.push(loginLogEntry);
+  // Record Login Audit Logs (Separate for Admin and Student)
+  if (user.is_admin || email.toLowerCase().includes('admin')) {
+    if (!db.admin_login_logs) db.admin_login_logs = [];
+    const adminLogEntry = {
+      id: "adm-log-" + Math.random().toString(36).substr(2, 9),
+      admin_name: user.full_name || "System Administrator",
+      email: user.college_email || email,
+      role: "System Administrator / HOD",
+      login_timestamp: new Date().toISOString(),
+      ip_address: req.ip || "127.0.0.1",
+      user_agent: req.headers['user-agent'] || "Browser Client"
+    };
+    db.admin_login_logs.unshift(adminLogEntry);
+    await logIncident(db, 'ADMIN_LOGIN', `Admin Session Initiated by ${user.full_name}`, `System administrator logged in successfully. IP: ${req.ip || '127.0.0.1'}`, user.full_name);
+    
+    if (supabaseClient) {
+      supabaseClient.from('admin_login_logs').insert([adminLogEntry]).then().catch(err => console.warn("Supabase admin log sync:", err.message));
+    }
+  } else {
+    if (!db.student_login_logs) db.student_login_logs = [];
+    const loginLogEntry = {
+      id: "log-" + Math.random().toString(36).substr(2, 9),
+      student_id: user.id,
+      student_name: user.full_name,
+      college_email: user.college_email,
+      batch_no: user.batch_no || batch_no || "2026-CS",
+      department: user.department || department || "Computer Science",
+      login_timestamp: new Date().toISOString(),
+      ip_address: req.ip || "127.0.0.1"
+    };
+    db.student_login_logs.unshift(loginLogEntry);
+    await logIncident(db, 'STUDENT_LOGIN', `Student Login: ${user.full_name}`, `Student ${user.full_name} (${user.department}) authenticated.`, user.full_name);
+    
+    if (supabaseClient) {
+      supabaseClient.from('student_login_logs').insert([loginLogEntry]).then().catch(err => console.warn("Supabase student log sync:", err.message));
+    }
+  }
 
   // Initialize Student Isolated Progress Record
   if (!db.student_progress) db.student_progress = {};
@@ -422,12 +482,16 @@ app.get('/api/admin/student-audit-logs', async (req, res) => {
   const db = await readDB();
   const students = (db.users || []).filter(u => !u.is_admin);
   const loginLogs = db.student_login_logs || [];
+  const adminLoginLogs = db.admin_login_logs || [];
+  const incidents = db.incidents || [];
   const studentProgress = db.student_progress || {};
 
   res.json({
     total_students: students.length,
     students,
     login_logs: loginLogs,
+    admin_login_logs: adminLoginLogs,
+    incidents: incidents,
     student_progress: studentProgress
   });
 });

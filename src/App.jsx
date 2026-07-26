@@ -1324,6 +1324,7 @@ export default function App() {
   const [mentorInput, setMentorInput] = useState('');
   const [mentorLoading, setMentorLoading] = useState(false);
 
+  const [maximizedPoster, setMaximizedPoster] = useState(null);
   const [knowledgeGraph, setKnowledgeGraph] = useState(null);
 
   // Fetch user data from backend when user changes
@@ -4223,8 +4224,15 @@ export default function App() {
                                 <h5 className="text-sm font-bold text-white">{ev.title}</h5>
                                 
                                 {ev.poster_url && (
-                                  <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-950 p-1">
+                                  <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-950 p-1">
                                     <img src={ev.poster_url} alt={ev.title} className="w-full max-h-56 object-cover rounded-lg" />
+                                    <button 
+                                      onClick={() => setMaximizedPoster({ url: ev.poster_url, title: ev.title, organizer: ev.organizer })}
+                                      className="absolute bottom-2.5 right-2.5 bg-slate-950/85 hover:bg-brand-600 text-white p-1.5 rounded-lg border border-white/20 shadow-lg backdrop-blur-md transition-all cursor-pointer group-hover:scale-110"
+                                      title="Maximize Event Poster"
+                                    >
+                                      <Maximize2 className="w-3.5 h-3.5" />
+                                    </button>
                                   </div>
                                 )}
 
@@ -4284,8 +4292,15 @@ export default function App() {
                                   <h5 className="text-xs font-bold text-white">{ev.title}</h5>
 
                                   {ev.poster_url && (
-                                    <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-950 p-1">
+                                    <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-950 p-1">
                                       <img src={ev.poster_url} alt={ev.title} className="w-full max-h-44 object-cover rounded-lg" />
+                                      <button 
+                                        onClick={() => setMaximizedPoster({ url: ev.poster_url, title: ev.title, organizer: ev.organizer })}
+                                        className="absolute bottom-2.5 right-2.5 bg-slate-950/85 hover:bg-brand-600 text-white p-1.5 rounded-lg border border-white/20 shadow-lg backdrop-blur-md transition-all cursor-pointer group-hover:scale-110"
+                                        title="Maximize Event Poster"
+                                      >
+                                        <Maximize2 className="w-3.5 h-3.5" />
+                                      </button>
                                     </div>
                                   )}
 
@@ -5182,26 +5197,123 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* SUB-PANEL 5: STUDENT ACTIVITY & AUDIT LOGS */}
+                  {/* SUB-PANEL 5: STUDENT & ADMIN ACTIVITY, INCIDENTS & AUDIT LOGS */}
                   {adminSubTab === 'audit_logs' && (
                     <div className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div className="p-4 bg-white/5 border border-white/10 rounded-2xl">
-                          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono">Registered Student Profiles</span>
+                          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono">Registered Students</span>
                           <h3 className="text-2xl font-extrabold text-white mt-1">{auditLogsData.total_students || 0}</h3>
                           <p className="text-[9px] text-emerald-400 font-mono mt-0.5">Active Freshers Accounts</p>
                         </div>
                         <div className="p-4 bg-white/5 border border-white/10 rounded-2xl">
-                          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono">Total Logins Recorded</span>
+                          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono">Student Logins</span>
                           <h3 className="text-2xl font-extrabold text-cyan-400 mt-1">{auditLogsData.login_logs?.length || 0}</h3>
-                          <p className="text-[9px] text-slate-400 font-mono mt-0.5">Every Login Timestamp Logged</p>
+                          <p className="text-[9px] text-slate-400 font-mono mt-0.5">Student SSO Logins</p>
                         </div>
                         <div className="p-4 bg-white/5 border border-white/10 rounded-2xl">
-                          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono">Isolated Student Data Stores</span>
-                          <h3 className="text-2xl font-extrabold text-purple-400 mt-1">{Object.keys(auditLogsData.student_progress || {}).length}</h3>
-                          <p className="text-[9px] text-purple-300 font-mono mt-0.5">Per-Student Progress Records</p>
+                          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono">Admin Logins Logged</span>
+                          <h3 className="text-2xl font-extrabold text-rose-400 mt-1">{auditLogsData.admin_login_logs?.length || 0}</h3>
+                          <p className="text-[9px] text-rose-300 font-mono mt-0.5">Admin & HOD Logins</p>
+                        </div>
+                        <div className="p-4 bg-white/5 border border-white/10 rounded-2xl">
+                          <span className="text-[10px] text-slate-400 font-bold uppercase font-mono">System Incidents</span>
+                          <h3 className="text-2xl font-extrabold text-purple-400 mt-1">{auditLogsData.incidents?.length || 0}</h3>
+                          <p className="text-[9px] text-purple-300 font-mono mt-0.5">Live Broadcast Trail</p>
                         </div>
                       </div>
+
+                      {/* Admin Login Audit Table */}
+                      <TiltCard3D className="p-6">
+                        <div className="pb-3 border-b border-white/5 mb-4 flex justify-between items-center">
+                          <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                            <UserCheck className="w-4 h-4 text-rose-400" />
+                            Admin & HOD Login Audit Log History (Saved in Supabase)
+                          </h4>
+                          <span className="text-[9px] font-mono text-rose-300 bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/20">
+                            🔒 Admin Authentication Trail
+                          </span>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs border-collapse">
+                            <thead>
+                              <tr className="border-b border-white/10 text-slate-400 font-mono text-[10px]">
+                                <th className="py-2.5 px-3">Admin Name</th>
+                                <th className="py-2.5 px-3">Email Address</th>
+                                <th className="py-2.5 px-3">Role / Authority</th>
+                                <th className="py-2.5 px-3">Login Timestamp</th>
+                                <th className="py-2.5 px-3">IP Address</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {(auditLogsData.admin_login_logs || []).length === 0 ? (
+                                <tr>
+                                  <td colSpan="5" className="py-6 text-center text-slate-500 italic">No admin logins recorded yet. Admin login activity will be logged here.</td>
+                                </tr>
+                              ) : (
+                                (auditLogsData.admin_login_logs || []).map((log, idx) => (
+                                  <tr key={idx} className="border-b border-white/5 text-slate-200 font-mono text-[11px]">
+                                    <td className="py-2.5 px-3 font-bold text-rose-300">{log.admin_name}</td>
+                                    <td className="py-2.5 px-3 text-cyan-300">{log.email}</td>
+                                    <td className="py-2.5 px-3 text-amber-400 font-bold">{log.role || "Administrator"}</td>
+                                    <td className="py-2.5 px-3 text-slate-400">{new Date(log.login_timestamp).toLocaleString()}</td>
+                                    <td className="py-2.5 px-3 text-slate-500">{log.ip_address}</td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </TiltCard3D>
+
+                      {/* System Incidents & Broadcast Event Log */}
+                      <TiltCard3D className="p-6">
+                        <div className="pb-3 border-b border-white/5 mb-4 flex justify-between items-center">
+                          <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                            <Bell className="w-4 h-4 text-purple-400" />
+                            System Incidents & Poster Upload Audit Trail
+                          </h4>
+                          <span className="text-[9px] font-mono text-purple-300 bg-purple-500/10 px-2.5 py-1 rounded-full border border-purple-500/20">
+                            📡 Real-time Broadcast Activity
+                          </span>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs border-collapse">
+                            <thead>
+                              <tr className="border-b border-white/10 text-slate-400 font-mono text-[10px]">
+                                <th className="py-2.5 px-3">Incident Type</th>
+                                <th className="py-2.5 px-3">Title</th>
+                                <th className="py-2.5 px-3">Description</th>
+                                <th className="py-2.5 px-3">Performed By</th>
+                                <th className="py-2.5 px-3">Timestamp</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {(auditLogsData.incidents || []).length === 0 ? (
+                                <tr>
+                                  <td colSpan="5" className="py-6 text-center text-slate-500 italic">No incidents recorded yet. Poster uploads and timetable updates will appear here.</td>
+                                </tr>
+                              ) : (
+                                (auditLogsData.incidents || []).map((inc, idx) => (
+                                  <tr key={idx} className="border-b border-white/5 text-slate-200 font-mono text-[11px]">
+                                    <td className="py-2.5 px-3">
+                                      <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-[9px] font-bold">
+                                        {inc.type}
+                                      </span>
+                                    </td>
+                                    <td className="py-2.5 px-3 font-bold text-white">{inc.title}</td>
+                                    <td className="py-2.5 px-3 text-slate-300">{inc.description}</td>
+                                    <td className="py-2.5 px-3 text-amber-400 font-bold">{inc.performed_by}</td>
+                                    <td className="py-2.5 px-3 text-slate-400">{new Date(inc.timestamp).toLocaleString()}</td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </TiltCard3D>
 
                       {/* Student Login Audit Log Table */}
                       <TiltCard3D className="p-6">
@@ -5211,7 +5323,7 @@ export default function App() {
                             Student SSO Login Audit Log History
                           </h4>
                           <span className="text-[9px] font-mono text-cyan-300 bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20">
-                            Live Login Audit
+                            Live Student Logins
                           </span>
                         </div>
 
@@ -5367,6 +5479,59 @@ export default function App() {
             </span>
           </button>
           
+        </div>
+      )}
+
+      {/* HIGH-RES POSTER LIGHTBOX / MAXIMIZE MODAL */}
+      {maximizedPoster && (
+        <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="relative max-w-4xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4 max-h-[95vh] overflow-y-auto no-scrollbar flex flex-col">
+            <div className="flex justify-between items-center pb-3 border-b border-white/10 shrink-0">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-brand-400" />
+                  {maximizedPoster.title}
+                </h3>
+                <p className="text-xs text-slate-400">Organizer: {maximizedPoster.organizer || "College Campus"}</p>
+              </div>
+              <button 
+                onClick={() => setMaximizedPoster(null)}
+                className="p-2 hover:bg-white/10 rounded-full text-slate-300 hover:text-white transition-all text-sm font-bold cursor-pointer"
+                title="Close Lightbox"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 flex justify-center items-center bg-black/60 rounded-2xl overflow-hidden p-2 border border-white/5">
+              <img 
+                src={maximizedPoster.url} 
+                alt={maximizedPoster.title} 
+                className="max-h-[70vh] w-auto object-contain rounded-xl shadow-2xl" 
+              />
+            </div>
+
+            <div className="flex justify-between items-center pt-2 shrink-0">
+              <span className="text-[10px] text-slate-400 font-mono font-bold">High Resolution Campus Poster View</span>
+              <div className="flex items-center gap-3">
+                <a 
+                  href={maximizedPoster.url} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="btn-3d btn-3d-sky px-4 py-2 text-xs text-white font-bold rounded-xl flex items-center gap-2 cursor-pointer"
+                >
+                  <span>Open Full Image in New Tab</span>
+                  <ChevronRight className="w-4 h-4" />
+                </a>
+                <button 
+                  onClick={() => setMaximizedPoster(null)}
+                  className="bg-white/10 hover:bg-white/20 text-slate-200 px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
