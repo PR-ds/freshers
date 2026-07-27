@@ -8,10 +8,12 @@ import {
 } from 'lucide-react';
 import * as THREE from 'three';
 
-// Base API URL pointing to the Node.js Express server
-const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:3000/api'
-  : `http://${window.location.hostname}:3000/api`;
+// Base API URL pointing to the Node.js Express server (Live Cloud & Local Device Support)
+const API_BASE = (import.meta.env.VITE_API_BASE)
+  ? import.meta.env.VITE_API_BASE
+  : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000/api'
+    : '/api';
 
 // Safe local storage wrapper to prevent crashes in strict private modes
 const safeStorage = {

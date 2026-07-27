@@ -121,15 +121,35 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GCS_BUCKET_NAME) {
 
 // Asynchronous GCS read/write helpers
 const readDB = async () => {
+  let dbData;
   if (file) {
     try {
       const [content] = await file.download();
-      return JSON.parse(content.toString('utf8'));
+      dbData = JSON.parse(content.toString('utf8'));
     } catch (err) {
       console.warn("⚠️ Failed to read from Google Cloud Storage, falling back to local file.", err.message);
     }
   }
-  return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+  if (!dbData) {
+    try {
+      dbData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    } catch (err) {
+      dbData = { users: [], onboarding_chats: {}, mentor_chats: {}, timetable: [], quizzes: [], attempts: [], friends: [], messages: [], notifications: [] };
+    }
+  }
+
+  // Baseline structure enforcement for live server continuation
+  if (!dbData.events) dbData.events = [];
+  if (!dbData.timetable) dbData.timetable = [];
+  if (!dbData.syllabus) dbData.syllabus = [];
+  if (!dbData.staff_schedules) dbData.staff_schedules = [];
+  if (!dbData.student_login_logs) dbData.student_login_logs = [];
+  if (!dbData.admin_login_logs) dbData.admin_login_logs = [];
+  if (!dbData.incidents) dbData.incidents = [];
+  if (!dbData.notifications) dbData.notifications = [];
+  if (!dbData.student_progress) dbData.student_progress = {};
+
+  return dbData;
 };
 
 const writeDB = async (data) => {
