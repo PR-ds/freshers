@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -13,6 +14,11 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Health Check endpoint for Render deployment monitoring
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', service: 'Freshers Portal Backend', timestamp: new Date().toISOString() });
+});
 
 // Supabase Realtime Database Client Initialization
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://xyzcompany.supabase.co';
