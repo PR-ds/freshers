@@ -940,11 +940,166 @@ app.post('/api/timetable/upload', async (req, res) => {
   }
 });
 
-app.get('/api/timetable/:batch', async (req, res) => {
-  const { batch } = req.params;
+const defaultTimetableSeed = [
+  {
+    id: "tt-cse-1",
+    department: "Computer Science Engineering (CSE B.E)",
+    year: "1st Year",
+    subject_name: "Odd Semester Official Class Timetable Chart",
+    timetable_image_url: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop",
+    created_at: new Date().toISOString()
+  },
+  {
+    id: "tt-aids-1",
+    department: "Artificial Intelligence and Data Science (AI&DS B.Tech)",
+    year: "1st Year",
+    subject_name: "AI & DS Semester 1 Schedule Diagram",
+    timetable_image_url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop",
+    created_at: new Date().toISOString()
+  }
+];
+
+const defaultStaffSchedulesSeed = [
+  {
+    id: "staff-1",
+    staff_name: "Dr. A. K. Sharma",
+    designation: "Senior Professor & HOD",
+    department: "Computer Science Engineering (CSE B.E)",
+    assigned_subjects: "Core Dept Subjects & Algorithms",
+    available_hours: "Mon, Wed, Fri: 10:00 AM - 12:30 PM",
+    schedule_image_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop",
+    created_at: new Date().toISOString()
+  },
+  {
+    id: "staff-2",
+    staff_name: "Dr. Meera Raman",
+    designation: "Associate Professor & AI Lead",
+    department: "Artificial Intelligence and Data Science (AI&DS B.Tech)",
+    assigned_subjects: "Neural Networks & Deep Learning Labs",
+    available_hours: "Tue, Thu: 02:00 PM - 04:30 PM",
+    schedule_image_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop",
+    created_at: new Date().toISOString()
+  }
+];
+
+app.get('/api/timetable/all', async (req, res) => {
   const db = await readDB();
-  const filtered = db.timetable.filter(t => t.batch_no === batch || t.department === batch);
-  res.json({ timetable: filtered });
+  if (!db.timetable || db.timetable.length === 0) {
+    db.timetable = defaultTimetableSeed;
+    await writeDB(db);
+  }
+  res.json({ timetable: db.timetable });
+});
+
+app.post('/api/timetable/manage', async (req, res) => {
+  const { department, year, subject_name, timetable_image_url } = req.body;
+  if (!department || !year) {
+    return res.status(400).json({ error: "Department and year are required." });
+  }
+
+  const db = await readDB();
+  if (!db.timetable) db.timetable = defaultTimetableSeed;
+
+  const newSlot = {
+    id: "tt-" + Math.random().toString(36).substr(2, 9),
+    department,
+    year,
+    subject_name: subject_name || `${department} Class Timetable Chart`,
+    timetable_image_url: timetable_image_url || "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop",
+    created_at: new Date().toISOString()
+  };
+
+  db.timetable.push(newSlot);
+
+  if (!db.notifications) db.notifications = [];
+  db.notifications.unshift({
+    id: "notif-" + Math.random().toString(36).substr(2, 9),
+    type: "academic",
+    title: `🕒 Class Timetable Published: ${department}`,
+    body: `New official Class Timetable published for ${department} (${year}). Check Academics option!`,
+    created_at: new Date().toISOString()
+  });
+
+  await writeDB(db);
+
+  const emailSubject = `[OFFICIAL ANNOUNCEMENT] Class Timetable Published: ${department} (${year})`;
+  const emailBody = `Dear Principal & HOD,\n\nA new official class timetable chart has been published by Admin.\n\nDepartment: ${department}\nAcademic Year: ${year}\nLabel: ${newSlot.subject_name}\nTimetable Image: ${newSlot.timetable_image_url}\n\nThis timetable has been permanently published and connected to student logins in Academics!`;
+
+  sendEmailNotification("principal@college.edu", emailSubject, emailBody).catch(err => console.error("Principal email fail:", err));
+
+  res.json({ success: true, slot: newSlot });
+});
+
+app.post('/api/timetable/delete', async (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).json({ error: "Slot id is required." });
+
+  const db = await readDB();
+  if (!db.timetable) db.timetable = [];
+  db.timetable = db.timetable.filter(t => t.id !== id);
+  await writeDB(db);
+  res.json({ success: true });
+});
+
+app.get('/api/staff_schedules', async (req, res) => {
+  const db = await readDB();
+  if (!db.staff_schedules || db.staff_schedules.length === 0) {
+    db.staff_schedules = defaultStaffSchedulesSeed;
+    await writeDB(db);
+  }
+  res.json({ staff_schedules: db.staff_schedules });
+});
+
+app.post('/api/staff_schedules/manage', async (req, res) => {
+  const { staff_name, designation, department, available_hours, assigned_subjects, schedule_image_url } = req.body;
+  if (!staff_name || !department) {
+    return res.status(400).json({ error: "Staff name and department are required." });
+  }
+
+  const db = await readDB();
+  if (!db.staff_schedules) db.staff_schedules = defaultStaffSchedulesSeed;
+
+  const newStaff = {
+    id: "staff-" + Math.random().toString(36).substr(2, 9),
+    staff_name,
+    designation: designation || "Faculty Administrator",
+    department,
+    available_hours: available_hours || "Mon - Fri: 09:00 AM - 04:00 PM",
+    assigned_subjects: assigned_subjects || "Department Core Courses",
+    schedule_image_url: schedule_image_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop",
+    created_at: new Date().toISOString()
+  };
+
+  db.staff_schedules.push(newStaff);
+
+  if (!db.notifications) db.notifications = [];
+  db.notifications.unshift({
+    id: "notif-" + Math.random().toString(36).substr(2, 9),
+    type: "academic",
+    title: `👨‍🏫 Faculty Schedule Published: ${staff_name}`,
+    body: `New Faculty Schedule published for ${staff_name} (${department}). Check Academics option!`,
+    created_at: new Date().toISOString()
+  });
+
+  await writeDB(db);
+
+  const emailSubject = `[OFFICIAL ANNOUNCEMENT] Faculty Staff Schedule Published: ${staff_name} (${department})`;
+  const emailBody = `Dear Principal & HOD,\n\nOfficial Faculty Staff Schedule and Availability Chart published by Admin.\n\nFaculty Name: ${staff_name}\nDesignation: ${newStaff.designation}\nDepartment: ${department}\nOffice Hours: ${newStaff.available_hours}\nSchedule Image: ${newStaff.schedule_image_url}\n\nThis schedule has been permanently connected to student logins in Academics!`;
+
+  sendEmailNotification("principal@college.edu", emailSubject, emailBody).catch(err => console.error("Principal email fail:", err));
+
+  res.json({ success: true, staff: newStaff });
+});
+
+app.post('/api/staff_schedules/delete', async (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).json({ error: "Staff id is required." });
+
+  const db = await readDB();
+  if (!db.staff_schedules) db.staff_schedules = [];
+  db.staff_schedules = db.staff_schedules.filter(s => s.id !== id);
+  await writeDB(db);
+  res.json({ success: true });
 });
 
 /* ==========================================================================

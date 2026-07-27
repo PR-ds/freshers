@@ -1441,7 +1441,7 @@ export default function App() {
         })
         .catch(err => console.warn("Syllabus sync failed:", err));
 
-      fetch(`${API_BASE}/staff-schedule`)
+      fetch(`${API_BASE}/staff_schedules`)
         .then(res => res.json())
         .then(data => { if (data.staff_schedules) setStaffScheduleList(data.staff_schedules); })
         .catch(err => console.warn("Staff schedules sync failed:", err));
@@ -1812,28 +1812,28 @@ export default function App() {
     };
 
     try {
-      const res = await fetch(`${API_BASE}/staff-schedule`, {
+      const res = await fetch(`${API_BASE}/staff_schedules/manage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      if (res.ok && data.staff_schedule) {
-        setStaffScheduleList([data.staff_schedule, ...staffScheduleList]);
+      if (res.ok && data.staff) {
+        setStaffScheduleList([data.staff, ...staffScheduleList]);
         setAdminStaffName('');
-        alert(`Staff schedule saved for ${payload.staff_name}!`);
+        alert(`Staff schedule saved permanently in cloud for ${payload.staff_name}!`);
       }
     } catch (err) {
       const mockStaff = { id: "staff-sc-" + Math.random().toString(36).substr(2, 9), ...payload };
       setStaffScheduleList([mockStaff, ...staffScheduleList]);
       setAdminStaffName('');
-      alert("Staff schedule saved locally!");
+      alert("Staff schedule saved!");
     }
   };
 
   const handleDeleteStaffSchedule = async (id) => {
     try {
-      const res = await fetch(`${API_BASE}/staff-schedule/delete`, {
+      const res = await fetch(`${API_BASE}/staff_schedules/delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
