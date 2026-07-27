@@ -1136,6 +1136,8 @@ export default function App() {
       full_name: editFullName.trim(),
       degree: editDegree,
       batch_no: editBatchNo.trim(),
+      faculty_id: user.is_admin ? editBatchNo.trim() : user.faculty_id,
+      id: user.is_admin ? editBatchNo.trim() : user.id,
       department: editDepartment,
       college_year: editCollegeYear,
       academic_interests: editInterests.split(',').map(s => s.trim()).filter(Boolean)
@@ -4220,7 +4222,9 @@ export default function App() {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Batch Number</label>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">
+                              {user.is_admin ? "Faculty ID / Login Credential" : "Batch Number"}
+                            </label>
                             <input 
                               type="text"
                               required
