@@ -3442,6 +3442,147 @@ export default function App() {
                     </div>
                   </TiltCard3D>
 
+                  {/* 1ST YEAR CLASS TIMETABLES & FACULTY RECORDS (MOVED TO ACADEMICS) */}
+                  <TiltCard3D className="p-6 space-y-6">
+                    <div className="pb-4 border-b border-white/5 flex flex-wrap justify-between items-center gap-3">
+                      <div>
+                        <h3 className="text-base font-bold text-white flex items-center gap-2">
+                          <Calendar className="w-5 h-5 text-cyan-400" />
+                          1st Year Class Timetable Images & Faculty Records
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-0.5">Official schedule charts and faculty advisors for 1st Year Freshers subjects</p>
+                      </div>
+                      <span className="text-[10px] bg-cyan-500/20 text-cyan-300 font-mono font-bold px-3 py-1 rounded-full border border-cyan-500/20">
+                        🎓 Freshers Portal (1st Year)
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      
+                      {/* 1st Year Class Timetable Image Viewer (Left 2 cols) */}
+                      <div className="lg:col-span-2 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                            <Clock className="w-4 h-4" />
+                            1st Year Class Timetable Images
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">Synced with Admin uploads</span>
+                        </div>
+
+                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
+                          {masterTimetableList.filter(t => t.timetable_image_url || t.schedule_image_url).length > 0 ? (
+                            masterTimetableList
+                              .filter(t => t.timetable_image_url || t.schedule_image_url)
+                              .map((t, idx) => (
+                                <div key={idx} className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <h5 className="font-bold text-white text-xs">{t.subject_name || `${t.department || '1st Year'} Class Timetable`}</h5>
+                                    <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">
+                                      {t.department || user.department || 'Freshers Dept'}
+                                    </span>
+                                  </div>
+                                  <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
+                                    <img src={t.timetable_image_url || t.schedule_image_url} alt="1st Year Timetable Chart" className="w-full max-h-72 object-contain rounded-lg" />
+                                  </div>
+                                </div>
+                              ))
+                          ) : (
+                            /* Default 1st Year Timetable Image Gallery */
+                            <div className="space-y-4">
+                              <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="font-bold text-white text-xs">1st Year CSE & General Engineering Class Timetable</h5>
+                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">1st Year CSE</span>
+                                </div>
+                                <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
+                                  <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop" alt="1st Year CSE Timetable" className="w-full max-h-64 object-contain rounded-lg" />
+                                </div>
+                              </div>
+                              <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="font-bold text-white text-xs">1st Year AI & DS Class Schedule Diagram</h5>
+                                  <span className="text-[9px] bg-purple-500/20 text-purple-300 font-mono font-bold px-2 py-0.5 rounded">1st Year AI & DS</span>
+                                </div>
+                                <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
+                                  <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop" alt="1st Year AI&DS Timetable" className="w-full max-h-64 object-contain rounded-lg" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 1st Year Faculty Records & Schedules (Right 1 col) */}
+                      <div className="space-y-4">
+                        <span className="text-xs font-bold text-purple-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                          <Users className="w-4 h-4" />
+                          1st Year Subject Faculty
+                        </span>
+
+                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
+                          {staffScheduleList.length > 0 ? (
+                            staffScheduleList.map((f, idx) => (
+                              <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">
+                                <div className="flex items-center gap-3">
+                                  <img 
+                                    src={f.schedule_image_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"} 
+                                    alt={f.staff_name} 
+                                    className="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0" 
+                                  />
+                                  <div>
+                                    <h4 className="font-bold text-white text-xs">{f.staff_name}</h4>
+                                    <p className="text-[9px] text-amber-400 font-mono">{f.designation}</p>
+                                    <p className="text-[9px] text-slate-400 truncate max-w-[150px]">{f.department}</p>
+                                  </div>
+                                </div>
+                                <div className="bg-slate-950 p-2 rounded-xl border border-white/5 text-[9px] font-mono space-y-1">
+                                  <p className="text-emerald-400 font-bold">📚 {f.assigned_subjects || "1st Year Core Subjects"}</p>
+                                  <p className="text-slate-300">⏰ {f.available_hours}</p>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            /* Default 1st Year Faculty Seeds */
+                            [
+                              {
+                                name: "Dr. A. K. Sharma",
+                                desig: "Senior Professor & HOD",
+                                dept: "Computer Science (1st Year)",
+                                subj: "CS101: Problem Solving & Data Structures",
+                                hours: "Mon, Wed, Fri: 10:00 AM - 12:30 PM",
+                                img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"
+                              },
+                              {
+                                name: "Prof. Priya Sen",
+                                desig: "1st Year Coordinator",
+                                dept: "AI & Data Science (1st Year)",
+                                subj: "AD101: Foundations of AI",
+                                hours: "Tue, Thu: 02:00 PM - 04:30 PM",
+                                img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop"
+                              }
+                            ].map((f, idx) => (
+                              <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">
+                                <div className="flex items-center gap-3">
+                                  <img src={f.img} alt={f.name} className="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0" />
+                                  <div>
+                                    <h4 className="font-bold text-white text-xs">{f.name}</h4>
+                                    <p className="text-[9px] text-amber-400 font-mono">{f.desig}</p>
+                                    <p className="text-[9px] text-slate-400">{f.dept}</p>
+                                  </div>
+                                </div>
+                                <div className="bg-slate-950 p-2 rounded-xl border border-white/5 text-[9px] font-mono space-y-1">
+                                  <p className="text-emerald-400 font-bold">📚 {f.subj}</p>
+                                  <p className="text-slate-300">⏰ {f.hours}</p>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+
+                    </div>
+                  </TiltCard3D>
+
                   {/* MODAL FOR DETAILED SYLLABUS SLOT (MAXIMIZED VIEW) */}
                   {maximizedSyllabus && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
@@ -3672,15 +3813,30 @@ export default function App() {
 
                     {/* RIGHT WORKSPACE: KNOWLEDGE GRAPH SLOT & DEPT CLUBS */}
                     <div className="space-y-8">
-                      {/* Interactive Flowchart Roadmap Slot */}
-                      <TiltCard3D className="p-6 h-[460px] flex flex-col justify-between">
-                        <div className="flex justify-between items-center pb-2 border-b border-white/5 mb-2">
+                      {/* Interactive Flowchart Roadmap Slot with 'Continue with <Domain>' Header */}
+                      <TiltCard3D className="p-6 min-h-[480px] flex flex-col justify-between space-y-4">
+                        {enrolledDomain && (
+                          <div className="p-4 bg-gradient-to-r from-purple-900/40 via-indigo-900/30 to-slate-900 border border-purple-500/30 rounded-2xl flex flex-wrap justify-between items-center gap-3">
+                            <div>
+                              <span className="text-[10px] text-purple-400 uppercase font-mono font-bold tracking-widest block">Active Domain Roadmap</span>
+                              <h3 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2 mt-0.5">
+                                <Sparkles className="w-5 h-5 text-purple-400 shrink-0" />
+                                Continue with {domainSkillsConfig[enrolledDomain]?.name || enrolledDomain.toUpperCase()}
+                              </h3>
+                            </div>
+                            <span className="text-xs bg-purple-500/20 text-purple-300 font-mono font-bold px-3 py-1.5 rounded-xl border border-purple-500/30">
+                              🎯 Progression Track Active
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between items-center pb-2 border-b border-white/5">
                           <h4 className="text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
                             <TrendingUp className="w-4 h-4" />
-                            Flowchart Learning Roadmap
+                            Flowchart Learning Roadmap & Milestone Sequence
                           </h4>
-                          <span className="text-[9px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded font-mono font-bold">
-                            Flowchart Sequence
+                          <span className="text-[9px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded font-mono font-bold">
+                            Interactive Flowchart
                           </span>
                         </div>
 
@@ -4032,161 +4188,142 @@ export default function App() {
                     )}
                   </TiltCard3D>
 
-                  {/* 1ST YEAR CLASS TIMETABLES & FACULTY RECORDS */}
-                  <TiltCard3D className="p-6 space-y-6">
-                    <div className="pb-4 border-b border-white/5 flex flex-wrap justify-between items-center gap-3">
-                      <div>
-                        <h3 className="text-base font-bold text-white flex items-center gap-2">
-                          <Calendar className="w-5 h-5 text-cyan-400" />
-                          1st Year Class Timetable Images & Faculty Records
-                        </h3>
-                        <p className="text-xs text-slate-400 mt-0.5">Official schedule charts and faculty advisors for 1st Year Freshers subjects</p>
-                      </div>
-                      <span className="text-[10px] bg-cyan-500/20 text-cyan-300 font-mono font-bold px-3 py-1 rounded-full border border-cyan-500/20">
-                        🎓 Freshers Portal (1st Year)
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      
-                      {/* 1st Year Class Timetable Image Viewer (Left 2 cols) */}
-                      <div className="lg:col-span-2 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                            <Clock className="w-4 h-4" />
-                            1st Year Class Timetable Images
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-mono">Synced with Admin uploads</span>
+                  {/* STUDENT CGPA SCORECARD & ACADEMIC CREDIT METRICS */}
+                  {!user.is_admin && (
+                    <TiltCard3D className="p-6 space-y-6">
+                      <div className="pb-4 border-b border-white/5 flex flex-wrap justify-between items-center gap-3">
+                        <div>
+                          <h3 className="text-base font-bold text-white flex items-center gap-2">
+                            <Award className="w-5 h-5 text-amber-400" />
+                            Academic CGPA Scorecard & Credit Metrics
+                          </h3>
+                          <p className="text-xs text-slate-400 mt-0.5">Verified university academic performance records & credit completion</p>
                         </div>
-
-                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
-                          {masterTimetableList.filter(t => t.timetable_image_url || t.schedule_image_url).length > 0 ? (
-                            masterTimetableList
-                              .filter(t => t.timetable_image_url || t.schedule_image_url)
-                              .map((t, idx) => (
-                                <div key={idx} className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
-                                  <div className="flex items-center justify-between">
-                                    <h5 className="font-bold text-white text-xs">{t.subject_name || `${t.department || '1st Year'} Class Timetable`}</h5>
-                                    <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">
-                                      {t.department || user.department || 'Freshers Dept'}
-                                    </span>
-                                  </div>
-                                  <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
-                                    <img src={t.timetable_image_url || t.schedule_image_url} alt="1st Year Timetable Chart" className="w-full max-h-72 object-contain rounded-lg" />
-                                  </div>
-                                </div>
-                              ))
-                          ) : (
-                            /* Default 1st Year Timetable Image Gallery */
-                            <div className="space-y-4">
-                              <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <h5 className="font-bold text-white text-xs">1st Year CSE & General Engineering Class Timetable</h5>
-                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">1st Year CSE</span>
-                                </div>
-                                <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
-                                  <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop" alt="1st Year CSE Timetable" className="w-full max-h-64 object-contain rounded-lg" />
-                                </div>
-                              </div>
-                              <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <h5 className="font-bold text-white text-xs">1st Year AI & DS Class Schedule Diagram</h5>
-                                  <span className="text-[9px] bg-purple-500/20 text-purple-300 font-mono font-bold px-2 py-0.5 rounded">1st Year AI & DS</span>
-                                </div>
-                                <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
-                                  <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop" alt="1st Year AI&DS Timetable" className="w-full max-h-64 object-contain rounded-lg" />
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* 1st Year Faculty Records & Schedules (Right 1 col) */}
-                      <div className="space-y-4">
-                        <span className="text-xs font-bold text-purple-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                          <Users className="w-4 h-4" />
-                          1st Year Subject Faculty
+                        <span className="text-[10px] bg-amber-500/20 text-amber-300 font-mono font-bold px-3 py-1 rounded-full border border-amber-500/20">
+                          🏆 Honors Academic Standing
                         </span>
+                      </div>
 
-                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
-                          {staffScheduleList.length > 0 ? (
-                            staffScheduleList.map((f, idx) => (
-                              <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">
-                                <div className="flex items-center gap-3">
-                                  <img 
-                                    src={f.schedule_image_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"} 
-                                    alt={f.staff_name} 
-                                    className="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0" 
-                                  />
-                                  <div>
-                                    <h4 className="font-bold text-white text-xs">{f.staff_name}</h4>
-                                    <p className="text-[9px] text-amber-400 font-mono">{f.designation}</p>
-                                    <p className="text-[9px] text-slate-400 truncate max-w-[150px]">{f.department}</p>
-                                  </div>
-                                </div>
-                                <div className="bg-slate-950 p-2 rounded-xl border border-white/5 text-[9px] font-mono space-y-1">
-                                  <p className="text-emerald-400 font-bold">📚 {f.assigned_subjects || "1st Year Core Subjects"}</p>
-                                  <p className="text-slate-300">⏰ {f.available_hours}</p>
-                                </div>
-                              </div>
-                            ))
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/5 rounded-2xl border border-amber-500/20 space-y-1">
+                          <span className="text-[10px] font-bold text-amber-400 uppercase font-mono tracking-wider">Overall CGPA</span>
+                          <h3 className="text-3xl font-extrabold text-white">8.85 <span className="text-xs text-slate-400 font-normal">/ 10.0</span></h3>
+                          <p className="text-[9px] text-emerald-400 font-mono">Top 5% Rank in Department</p>
+                        </div>
+
+                        <div className="p-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/5 rounded-2xl border border-cyan-500/20 space-y-1">
+                          <span className="text-[10px] font-bold text-cyan-400 uppercase font-mono tracking-wider">Recent Semester SGPA</span>
+                          <h3 className="text-3xl font-extrabold text-white">9.12 <span className="text-xs text-slate-400 font-normal">SGPA</span></h3>
+                          <p className="text-[9px] text-cyan-300 font-mono">1st Semester Final Score</p>
+                        </div>
+
+                        <div className="p-4 bg-gradient-to-br from-purple-500/10 to-indigo-500/5 rounded-2xl border border-purple-500/20 space-y-1">
+                          <span className="text-[10px] font-bold text-purple-400 uppercase font-mono tracking-wider">Credits Completed</span>
+                          <h3 className="text-3xl font-extrabold text-white">28 <span className="text-xs text-slate-400 font-normal">/ 160 Credits</span></h3>
+                          <p className="text-[9px] text-purple-300 font-mono">All 1st Year Core Credits Met</p>
+                        </div>
+
+                        <div className="p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/5 rounded-2xl border border-emerald-500/20 space-y-1">
+                          <span className="text-[10px] font-bold text-emerald-400 uppercase font-mono tracking-wider">On-Duty (OD) Credits</span>
+                          <h3 className="text-3xl font-extrabold text-white">12 <span className="text-xs text-slate-400 font-normal">Hours</span></h3>
+                          <p className="text-[9px] text-emerald-300 font-mono">Verified Event Attendance</p>
+                        </div>
+                      </div>
+                    </TiltCard3D>
+                  )}
+
+                  {/* STUDENT PARTICIPATED & EAGER-TO-PARTICIPATE EVENTS DASHBOARD */}
+                  {!user.is_admin && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      
+                      {/* PARTICIPATED EVENTS LIST */}
+                      <TiltCard3D className="p-6 space-y-4">
+                        <div className="pb-3 border-b border-white/5 flex justify-between items-center">
+                          <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                            Participated & Registered Events
+                          </h4>
+                          <span className="text-[9px] font-mono text-emerald-300 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                            Registered & Attended
+                          </span>
+                        </div>
+
+                        <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1 no-scrollbar text-xs">
+                          {((studentIsolatedProgress?.registered_events || []).length === 0 && eventsList.slice(0, 1).length === 0) ? (
+                            <p className="text-xs text-slate-500 italic py-6 text-center">No registered events yet. Register for hackathons to view team Google Docs here.</p>
                           ) : (
-                            /* Default 1st Year Faculty Seeds */
-                            [
-                              {
-                                name: "Dr. A. K. Sharma",
-                                desig: "Senior Professor & HOD",
-                                dept: "Computer Science (1st Year)",
-                                subj: "CS101: Problem Solving & Data Structures",
-                                hours: "Mon, Wed, Fri: 10:00 AM - 12:30 PM",
-                                img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"
-                              },
-                              {
-                                name: "Prof. Priya Sen",
-                                desig: "1st Year Coordinator",
-                                dept: "AI & Data Science (1st Year)",
-                                subj: "AD101: Foundations of AI",
-                                hours: "Tue, Thu: 02:00 PM - 04:30 PM",
-                                img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop"
-                              },
-                              {
-                                name: "Dr. S. Rajesh",
-                                desig: "Professor of Physics",
-                                dept: "Physics Dept (1st Year)",
-                                subj: "PH101: Engineering Physics & Optics",
-                                hours: "Mon to Thu: 11:00 AM - 01:00 PM",
-                                img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&auto=format&fit=crop"
-                              },
-                              {
-                                name: "Prof. Meera Nair",
-                                desig: "Assistant Professor",
-                                dept: "Mathematics (1st Year)",
-                                subj: "MA101: Matrices & Differential Calculus",
-                                hours: "Mon, Wed: 01:30 PM - 03:30 PM",
-                                img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=800&auto=format&fit=crop"
-                              }
-                            ].map((f, idx) => (
-                              <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">
-                                <div className="flex items-center gap-3">
-                                  <img src={f.img} alt={f.name} className="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0" />
-                                  <div>
-                                    <h4 className="font-bold text-white text-xs">{f.name}</h4>
-                                    <p className="text-[9px] text-amber-400 font-mono">{f.desig}</p>
-                                    <p className="text-[9px] text-slate-400">{f.dept}</p>
-                                  </div>
+                            eventsList.slice(0, 2).map((ev, idx) => (
+                              <div key={idx} className="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                                <div className="flex justify-between items-start">
+                                  <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded uppercase">
+                                    Participated / Registered
+                                  </span>
+                                  <span className="text-[9px] text-slate-400 font-mono">{ev.date_string || "July 2026"}</span>
                                 </div>
-                                <div className="bg-slate-950 p-2 rounded-xl border border-white/5 text-[9px] font-mono space-y-1">
-                                  <p className="text-emerald-400 font-bold">📚 {f.subj}</p>
-                                  <p className="text-slate-300">⏰ {f.hours}</p>
+                                <h5 className="font-bold text-white text-xs">{ev.title}</h5>
+                                <p className="text-[10px] text-slate-400 line-clamp-2">{ev.description}</p>
+                                <div className="pt-2 border-t border-white/5 flex justify-between items-center text-[10px]">
+                                  <span className="text-emerald-400 font-bold font-mono">OD Attendance Granted ✔</span>
+                                  <a 
+                                    href={ev.registration_link || "https://docs.google.com/document/d/1O7VC6KLIYEL/edit?usp=sharing"} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    className="text-cyan-400 hover:underline font-mono font-bold"
+                                  >
+                                    📄 Google Doc →
+                                  </a>
                                 </div>
                               </div>
                             ))
                           )}
                         </div>
-                      </div>
+                      </TiltCard3D>
+
+                      {/* EAGER-TO-PARTICIPATE WISHLIST EVENTS */}
+                      <TiltCard3D className="p-6 space-y-4">
+                        <div className="pb-3 border-b border-white/5 flex justify-between items-center">
+                          <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-purple-400" />
+                            Eager to Participate (Saved Wishlist)
+                          </h4>
+                          <span className="text-[9px] font-mono text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
+                            Upcoming Wishlist
+                          </span>
+                        </div>
+
+                        <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1 no-scrollbar text-xs">
+                          {eventsList.filter(e => !e.is_ongoing).length === 0 ? (
+                            <p className="text-xs text-slate-500 italic py-6 text-center">No upcoming events saved in wishlist.</p>
+                          ) : (
+                            eventsList.filter(e => !e.is_ongoing).slice(0, 3).map((ev) => (
+                              <div key={ev.id} className="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                                <div className="flex justify-between items-start">
+                                  <span className="text-[9px] bg-purple-500/20 text-purple-300 font-bold px-2 py-0.5 rounded uppercase">
+                                    ⭐ Eager to Join
+                                  </span>
+                                  <span className="text-[9px] text-slate-400 font-mono">{ev.date_string}</span>
+                                </div>
+                                <h5 className="font-bold text-white text-xs">{ev.title}</h5>
+                                <p className="text-[10px] text-slate-400 line-clamp-2">{ev.description}</p>
+                                <div className="pt-2 border-t border-white/5 flex justify-between items-center">
+                                  <span className="text-[9px] text-slate-500 font-bold">{ev.organizer}</span>
+                                  <button 
+                                    onClick={() => {
+                                      setActiveTab('events');
+                                      setRegisterEvent(ev);
+                                    }}
+                                    className="btn-3d btn-3d-purple px-3 py-1 text-[9px] text-white font-bold cursor-pointer uppercase"
+                                  >
+                                    Register Team 📋
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </TiltCard3D>
                     </div>
-                  </TiltCard3D>
+                  )}
 
                   {/* OTHER PERSONAL RECORDS (Notifications Hub Only) */}
                   <TiltCard3D className="p-6">
