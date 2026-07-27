@@ -85,6 +85,17 @@ const matchesStudentDepartment = (itemDept, studentDept) => {
   return item.includes(student) || student.includes(item);
 };
 
+// Helper for section-specific filtering of timetables and staff schedules
+const matchesStudentSection = (itemSection, studentSection) => {
+  if (!itemSection || !studentSection) return true;
+  const item = itemSection.toLowerCase().trim();
+  const student = studentSection.toLowerCase().trim();
+  if (item.includes('both') || item.includes('all')) return true;
+  if (student.includes('a') && item.includes('a')) return true;
+  if (student.includes('b') && item.includes('b')) return true;
+  return item.includes(student) || student.includes(item);
+};
+
 /* ==========================================================================
    3D BACKGROUND PARTICLE SYSTEM (Cyber-Cyan and Hot-Pink Stardust)
    ========================================================================== */
@@ -963,6 +974,7 @@ export default function App() {
   const [loginPassword, setLoginPassword] = useState('');
   const [loginBatchNo, setLoginBatchNo] = useState('2026-CS');
   const [loginDepartment, setLoginDepartment] = useState('Computer Science Engineering (CSE B.E)');
+  const [loginSection, setLoginSection] = useState('Section A');
   const [loginOTP, setLoginOTP] = useState('');
   const [serverOTPCode, setServerOTPCode] = useState('');
   const [loginStep, setLoginStep] = useState('email'); // 'email' | 'otp'
@@ -1024,6 +1036,7 @@ export default function App() {
   // Admin Timetable Management States (Years 1 to 4 & All Depts)
   const [adminTTDept, setAdminTTDept] = useState('Computer Science Engineering (CSE B.E)');
   const [adminTTYear, setAdminTTYear] = useState('1st Year');
+  const [adminTTSection, setAdminTTSection] = useState('Section A');
   const [adminTTSubject, setAdminTTSubject] = useState('');
   const [adminTTDay, setAdminTTDay] = useState('Monday');
   const [adminTTStart, setAdminTTStart] = useState('09:00 AM');
@@ -1039,6 +1052,7 @@ export default function App() {
   const [adminStaffName, setAdminStaffName] = useState('');
   const [adminStaffDesignation, setAdminStaffDesignation] = useState('Professor & HOD');
   const [adminStaffDept, setAdminStaffDept] = useState('Computer Science Engineering (CSE B.E)');
+  const [adminStaffSection, setAdminStaffSection] = useState('Section A');
   const [adminStaffHours, setAdminStaffHours] = useState('Mon, Wed, Fri: 10:00 AM - 12:30 PM');
   const [adminStaffSubjects, setAdminStaffSubjects] = useState('Data Structures, Algorithms');
   const [adminStaffImage, setAdminStaffImage] = useState('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop');
@@ -1109,6 +1123,7 @@ export default function App() {
   const [editDegree, setEditDegree] = useState('B.Tech/B.E');
   const [editBatchNo, setEditBatchNo] = useState('');
   const [editDepartment, setEditDepartment] = useState('Computer Science Engineering (CSE B.E)');
+  const [editSection, setEditSection] = useState('Section A');
   const [editCollegeYear, setEditCollegeYear] = useState('1st Year');
   const [editInterests, setEditInterests] = useState('');
 
@@ -1117,6 +1132,7 @@ export default function App() {
     setEditDegree(user?.degree || 'B.Tech/B.E');
     setEditBatchNo(user?.batch_no || '');
     setEditDepartment(user?.department || 'Computer Science');
+    setEditSection(user?.section || 'Section A');
     setEditCollegeYear(user?.college_year || '1st Year');
     
     // Handle array or comma-separated string interests
@@ -1139,6 +1155,7 @@ export default function App() {
       faculty_id: user.is_admin ? editBatchNo.trim() : user.faculty_id,
       id: user.is_admin ? editBatchNo.trim() : user.id,
       department: editDepartment,
+      section: editSection,
       college_year: editCollegeYear,
       academic_interests: editInterests.split(',').map(s => s.trim()).filter(Boolean)
     };
@@ -1546,6 +1563,7 @@ export default function App() {
         body: JSON.stringify({ 
           email: loginEmail,
           department: loginDepartment,
+          section: loginSection,
           batch_no: loginBatchNo,
           role: loginRole,
           password: adminPassword,
@@ -1575,6 +1593,7 @@ export default function App() {
         degree: 'B.Tech/B.E',
         batch_no: loginBatchNo,
         department: loginDepartment,
+        section: loginSection,
         college_year: '1st Year',
         degree_completion: adminDegreeCompletion,
         experience: adminExperience,
@@ -2953,6 +2972,18 @@ export default function App() {
                         <option value="Department of Tamil">Department of Tamil</option>
                       </select>
                     </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">Select Class Section</label>
+                      <select 
+                        value={loginSection}
+                        onChange={(e) => setLoginSection(e.target.value)}
+                        className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 transition-all font-sans"
+                      >
+                        <option value="Section A">Section A</option>
+                        <option value="Section B">Section B</option>
+                      </select>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -3577,19 +3608,29 @@ export default function App() {
                         </div>
 
                         <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
-                          {masterTimetableList.filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || matchesStudentDepartment(t.department, user.department))).length > 0 ? (
+                          {masterTimetableList.filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || (matchesStudentDepartment(t.department, user.department) && matchesStudentSection(t.section, user.section)))).length > 0 ? (
                             masterTimetableList
-                              .filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || matchesStudentDepartment(t.department, user.department)))
+                              .filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || (matchesStudentDepartment(t.department, user.department) && matchesStudentSection(t.section, user.section))))
                               .map((t, idx) => (
                                 <div key={idx} className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
                                   <div className="flex items-center justify-between">
-                                    <h5 className="font-bold text-white text-xs">{t.subject_name || `${t.department || '1st Year'} Class Timetable`}</h5>
+                                    <div>
+                                      <h5 className="font-bold text-white text-xs">{t.subject_name || `${t.department || '1st Year'} Class Timetable`}</h5>
+                                      <p className="text-[9px] text-cyan-400 font-mono font-bold mt-0.5">{t.section || "Section A"}</p>
+                                    </div>
                                     <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">
                                       {t.department || user.department || 'Freshers Dept'}
                                     </span>
                                   </div>
-                                  <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
+                                  <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
                                     <img src={t.timetable_image_url || t.schedule_image_url} alt="Class Timetable Chart" className="w-full max-h-72 object-contain rounded-lg" />
+                                    <button 
+                                      onClick={() => setMaximizedPoster({ title: t.subject_name || `${t.department || 'Class'} Timetable`, poster_url: t.timetable_image_url || t.schedule_image_url, type: 'Class Timetable', organizer: t.department })}
+                                      className="absolute bottom-2.5 right-2.5 p-1.5 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer"
+                                      title="Maximize Class Timetable Chart"
+                                    >
+                                      <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />
+                                    </button>
                                   </div>
                                 </div>
                               ))
@@ -3598,7 +3639,10 @@ export default function App() {
                             <div className="space-y-4">
                               <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
                                 <div className="flex items-center justify-between">
-                                  <h5 className="font-bold text-white text-xs">{user.department || 'Department'} Class Schedule</h5>
+                                  <div>
+                                    <h5 className="font-bold text-white text-xs">{user.department || 'Department'} Class Schedule</h5>
+                                    <p className="text-[9px] text-cyan-400 font-mono font-bold mt-0.5">{user.section || "Section A"}</p>
+                                  </div>
                                   <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">{user.department || 'General'}</span>
                                 </div>
                                 <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
@@ -3610,17 +3654,17 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* 1st Year Faculty Records & Schedules (Right 1 col - Department Filtered) */}
+                      {/* 1st Year Faculty Records & Schedules (Right 1 col - Department & Section Filtered) */}
                       <div className="space-y-4">
                         <span className="text-xs font-bold text-purple-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
                           <Users className="w-4 h-4" />
-                          {user.is_admin ? "All Faculty Schedules" : `${user.department || 'Department'} Faculty`}
+                          {user.is_admin ? "All Faculty Schedules" : `${user.department || 'Department'} (${user.section || 'Section A'}) Faculty`}
                         </span>
 
                         <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
-                          {staffScheduleList.filter(f => user.is_admin || matchesStudentDepartment(f.department, user.department)).length > 0 ? (
+                          {staffScheduleList.filter(f => user.is_admin || (matchesStudentDepartment(f.department, user.department) && matchesStudentSection(f.section, user.section))).length > 0 ? (
                             staffScheduleList
-                              .filter(f => user.is_admin || matchesStudentDepartment(f.department, user.department))
+                              .filter(f => user.is_admin || (matchesStudentDepartment(f.department, user.department) && matchesStudentSection(f.section, user.section)))
                               .map((f, idx) => (
                                 <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">
                                   <div className="flex items-center gap-3">
@@ -3631,14 +3675,26 @@ export default function App() {
                                     />
                                     <div>
                                       <h4 className="font-bold text-white text-xs">{f.staff_name}</h4>
-                                      <p className="text-[9px] text-amber-400 font-mono">{f.designation}</p>
+                                      <p className="text-[9px] text-amber-400 font-mono">{f.designation} • <span className="text-cyan-300 font-bold">{f.section || 'Section A'}</span></p>
                                       <p className="text-[9px] text-slate-400 truncate max-w-[150px]">{f.department}</p>
                                     </div>
                                   </div>
                                   <div className="bg-slate-950 p-2 rounded-xl border border-white/5 text-[9px] font-mono space-y-1">
-                                    <p className="text-emerald-400 font-bold">📚 {f.assigned_subjects || "Core Subjects"}</p>
+                                    <p className="text-emerald-400 font-bold">📚 Subject: {f.assigned_subjects || "Core Subjects"}</p>
                                     <p className="text-slate-300">⏰ {f.available_hours}</p>
                                   </div>
+                                  {f.schedule_image_url && (
+                                    <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-1 mt-2">
+                                      <img src={f.schedule_image_url} alt={f.staff_name} className="w-full max-h-40 object-cover rounded-lg" />
+                                      <button 
+                                        onClick={() => setMaximizedPoster({ title: `${f.staff_name} (${f.designation}) Schedule`, poster_url: f.schedule_image_url, type: 'Staff Schedule', organizer: f.department })}
+                                        className="absolute bottom-2.5 right-2.5 p-1.5 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer"
+                                        title="Maximize Staff Schedule Image"
+                                      >
+                                        <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
                               ))
                           ) : (
@@ -4178,6 +4234,10 @@ export default function App() {
                               <p className="text-slate-300 text-sm font-semibold">{user.department || "Computer Science"}</p>
                             </div>
                             <div>
+                              <span className="text-[10px] font-bold text-slate-500 uppercase">Class Section</span>
+                              <p className="text-cyan-400 text-sm font-bold uppercase font-mono">{user.section || "Section A"}</p>
+                            </div>
+                            <div>
                               <span className="text-[10px] font-bold text-slate-500 uppercase">Academic Interests</span>
                               <p className="text-slate-300 text-sm font-semibold">
                                 {Array.isArray(user.academic_interests) 
@@ -4258,6 +4318,17 @@ export default function App() {
                               <option value="Department of Mathematics">Department of Mathematics</option>
                               <option value="Department of MBA">Department of MBA</option>
                               <option value="Department of Tamil">Department of Tamil</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Class Section</label>
+                            <select 
+                              value={editSection}
+                              onChange={(e) => setEditSection(e.target.value)}
+                              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-purple-500 font-bold"
+                            >
+                              <option value="Section A">Section A</option>
+                              <option value="Section B">Section B</option>
                             </select>
                           </div>
                           {!user.is_admin && (
@@ -5065,18 +5136,32 @@ export default function App() {
                               </select>
                             </div>
 
-                            <div>
-                              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Academic Year</label>
-                              <select 
-                                value={adminTTYear}
-                                onChange={(e) => setAdminTTYear(e.target.value)}
-                                className="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-2 text-white focus:outline-none"
-                              >
-                                <option value="1st Year">1st Year (Fresher)</option>
-                                <option value="2nd Year">2nd Year (Sophomore)</option>
-                                <option value="3rd Year">3rd Year (Junior)</option>
-                                <option value="4th Year">4th Year (Senior)</option>
-                              </select>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Academic Year</label>
+                                <select 
+                                  value={adminTTYear}
+                                  onChange={(e) => setAdminTTYear(e.target.value)}
+                                  className="w-full bg-slate-900 border border-slate-850 rounded-xl px-2.5 py-2 text-white focus:outline-none"
+                                >
+                                  <option value="1st Year">1st Year (Fresher)</option>
+                                  <option value="2nd Year">2nd Year (Sophomore)</option>
+                                  <option value="3rd Year">3rd Year (Junior)</option>
+                                  <option value="4th Year">4th Year (Senior)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Target Section</label>
+                                <select 
+                                  value={adminTTSection}
+                                  onChange={(e) => setAdminTTSection(e.target.value)}
+                                  className="w-full bg-slate-900 border border-slate-850 rounded-xl px-2.5 py-2 text-white focus:outline-none"
+                                >
+                                  <option value="Section A">Section A</option>
+                                  <option value="Section B">Section B</option>
+                                  <option value="Both Sections">Both Sections (A & B)</option>
+                                </select>
+                              </div>
                             </div>
 
                             <div>
@@ -5197,6 +5282,18 @@ export default function App() {
                               />
                             </div>
 
+                            <div>
+                              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Subject / Course Name</label>
+                              <input 
+                                type="text" 
+                                placeholder="e.g. Data Structures & Algorithms (CS101)"
+                                required
+                                value={adminStaffSubjects}
+                                onChange={(e) => setAdminStaffSubjects(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-2 text-white"
+                              />
+                            </div>
+
                             <div className="grid grid-cols-2 gap-2">
                               <div>
                                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Designation</label>
@@ -5209,29 +5306,42 @@ export default function App() {
                                 />
                               </div>
                               <div>
-                                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Department</label>
+                                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Class Section</label>
                                 <select 
-                                  value={adminStaffDept}
-                                  onChange={(e) => setAdminStaffDept(e.target.value)}
+                                  value={adminStaffSection}
+                                  onChange={(e) => setAdminStaffSection(e.target.value)}
                                   className="w-full bg-slate-900 border border-slate-850 rounded-xl px-2 py-1.5 text-white text-[10px]"
                                 >
-                                  <option value="Computer Science Engineering (CSE B.E)">Computer Science Engineering (CSE B.E)</option>
-                                  <option value="Artificial Intelligence and Data Science (AI&DS B.Tech)">Artificial Intelligence and Data Science (AI&DS B.Tech)</option>
-                                  <option value="Artificial Intelligence and Machine Learning (AI&ML B.Tech)">Artificial Intelligence and Machine Learning (AI&ML B.Tech)</option>
-                                  <option value="Computer Science and Business Systems (CSBS B.Tech)">Computer Science and Business Systems (CSBS B.Tech)</option>
-                                  <option value="Electronics and Communication Engineering (ECE B.E)">Electronics and Communication Engineering (ECE B.E)</option>
-                                  <option value="Electrical and Electronics Engineering (EEE B.E)">Electrical and Electronics Engineering (EEE B.E)</option>
-                                  <option value="Civil Engineering (B.E)">Civil Engineering (B.E)</option>
-                                  <option value="Mechanical Engineering (B.E)">Mechanical Engineering (B.E)</option>
-                                  <option value="CyberSecurity (B.Tech)">CyberSecurity (B.Tech)</option>
-                                  <option value="Department of Physics">Department of Physics</option>
-                                  <option value="Department of Chemistry">Department of Chemistry</option>
-                                  <option value="Department of Professional English">Department of Professional English</option>
-                                  <option value="Department of Mathematics">Department of Mathematics</option>
-                                  <option value="Department of MBA">Department of MBA</option>
-                                  <option value="Department of Tamil">Department of Tamil</option>
+                                  <option value="Section A">Section A</option>
+                                  <option value="Section B">Section B</option>
+                                  <option value="Both Sections">Both Sections (A & B)</option>
                                 </select>
                               </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Department</label>
+                              <select 
+                                value={adminStaffDept}
+                                onChange={(e) => setAdminStaffDept(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-850 rounded-xl px-2 py-1.5 text-white text-[10px]"
+                              >
+                                <option value="Computer Science Engineering (CSE B.E)">Computer Science Engineering (CSE B.E)</option>
+                                <option value="Artificial Intelligence and Data Science (AI&DS B.Tech)">Artificial Intelligence and Data Science (AI&DS B.Tech)</option>
+                                <option value="Artificial Intelligence and Machine Learning (AI&ML B.Tech)">Artificial Intelligence and Machine Learning (AI&ML B.Tech)</option>
+                                <option value="Computer Science and Business Systems (CSBS B.Tech)">Computer Science and Business Systems (CSBS B.Tech)</option>
+                                <option value="Electronics and Communication Engineering (ECE B.E)">Electronics and Communication Engineering (ECE B.E)</option>
+                                <option value="Electrical and Electronics Engineering (EEE B.E)">Electrical and Electronics Engineering (EEE B.E)</option>
+                                <option value="Civil Engineering (B.E)">Civil Engineering (B.E)</option>
+                                <option value="Mechanical Engineering (B.E)">Mechanical Engineering (B.E)</option>
+                                <option value="CyberSecurity (B.Tech)">CyberSecurity (B.Tech)</option>
+                                <option value="Department of Physics">Department of Physics</option>
+                                <option value="Department of Chemistry">Department of Chemistry</option>
+                                <option value="Department of Professional English">Department of Professional English</option>
+                                <option value="Department of Mathematics">Department of Mathematics</option>
+                                <option value="Department of MBA">Department of MBA</option>
+                                <option value="Department of Tamil">Department of Tamil</option>
+                              </select>
                             </div>
 
                             <div>

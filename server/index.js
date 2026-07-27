@@ -992,7 +992,7 @@ app.get('/api/timetable/all', async (req, res) => {
 });
 
 app.post('/api/timetable/manage', async (req, res) => {
-  const { department, year, subject_name, timetable_image_url } = req.body;
+  const { department, year, section, subject_name, timetable_image_url } = req.body;
   if (!department || !year) {
     return res.status(400).json({ error: "Department and year are required." });
   }
@@ -1004,7 +1004,8 @@ app.post('/api/timetable/manage', async (req, res) => {
     id: "tt-" + Math.random().toString(36).substr(2, 9),
     department,
     year,
-    subject_name: subject_name || `${department} Class Timetable Chart`,
+    section: section || "Both Sections",
+    subject_name: subject_name || `${department} (${section || 'Section A'}) Class Timetable Chart`,
     timetable_image_url: timetable_image_url || "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop",
     created_at: new Date().toISOString()
   };
@@ -1015,15 +1016,15 @@ app.post('/api/timetable/manage', async (req, res) => {
   db.notifications.unshift({
     id: "notif-" + Math.random().toString(36).substr(2, 9),
     type: "academic",
-    title: `🕒 Class Timetable Published: ${department}`,
-    body: `New official Class Timetable published for ${department} (${year}). Check Academics option!`,
+    title: `🕒 Class Timetable Published: ${department} (${newSlot.section})`,
+    body: `New official Class Timetable published for ${department} ${newSlot.section} (${year}). Check Academics option!`,
     created_at: new Date().toISOString()
   });
 
   await writeDB(db);
 
-  const emailSubject = `[OFFICIAL ANNOUNCEMENT] Class Timetable Published: ${department} (${year})`;
-  const emailBody = `Dear Principal & HOD,\n\nA new official class timetable chart has been published by Admin.\n\nDepartment: ${department}\nAcademic Year: ${year}\nLabel: ${newSlot.subject_name}\nTimetable Image: ${newSlot.timetable_image_url}\n\nThis timetable has been permanently published and connected to student logins in Academics!`;
+  const emailSubject = `[OFFICIAL ANNOUNCEMENT] Class Timetable Published: ${department} ${newSlot.section} (${year})`;
+  const emailBody = `Dear Principal & HOD,\n\nA new official class timetable chart has been published by Admin.\n\nDepartment: ${department}\nSection: ${newSlot.section}\nAcademic Year: ${year}\nLabel: ${newSlot.subject_name}\nTimetable Image: ${newSlot.timetable_image_url}\n\nThis timetable has been permanently published and connected to student logins in Academics!`;
 
   sendEmailNotification("principal@college.edu", emailSubject, emailBody).catch(err => console.error("Principal email fail:", err));
 
@@ -1051,7 +1052,7 @@ app.get('/api/staff_schedules', async (req, res) => {
 });
 
 app.post('/api/staff_schedules/manage', async (req, res) => {
-  const { staff_name, designation, department, available_hours, assigned_subjects, schedule_image_url } = req.body;
+  const { staff_name, designation, department, section, available_hours, assigned_subjects, schedule_image_url } = req.body;
   if (!staff_name || !department) {
     return res.status(400).json({ error: "Staff name and department are required." });
   }
@@ -1064,8 +1065,9 @@ app.post('/api/staff_schedules/manage', async (req, res) => {
     staff_name,
     designation: designation || "Faculty Administrator",
     department,
+    section: section || "Both Sections",
+    assigned_subjects: assigned_subjects || "Core Department Subject",
     available_hours: available_hours || "Mon - Fri: 09:00 AM - 04:00 PM",
-    assigned_subjects: assigned_subjects || "Department Core Courses",
     schedule_image_url: schedule_image_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop",
     created_at: new Date().toISOString()
   };
