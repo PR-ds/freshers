@@ -69,6 +69,15 @@ const matchesStudentDepartment = (itemDept, studentDept) => {
   if (student.includes('civil')) {
     return item.includes('civil');
   }
+  if (student.includes('ai&ml') || student.includes('machine learning') || student.includes('aiml')) {
+    return item.includes('ai') || item.includes('ml') || item.includes('machine learning') || item.includes('aiml');
+  }
+  if (student.includes('physics')) return item.includes('physics');
+  if (student.includes('chemistry')) return item.includes('chemistry');
+  if (student.includes('english')) return item.includes('english');
+  if (student.includes('math')) return item.includes('math');
+  if (student.includes('mba')) return item.includes('mba');
+  if (student.includes('tamil')) return item.includes('tamil');
   if (student.includes('cyber')) {
     return item.includes('cyber');
   }
@@ -2934,6 +2943,12 @@ export default function App() {
                         <option value="Civil Engineering (B.E)">Civil Engineering (B.E)</option>
                         <option value="Mechanical Engineering (B.E)">Mechanical Engineering (B.E)</option>
                         <option value="CyberSecurity (B.Tech)">CyberSecurity (B.Tech)</option>
+                        <option value="Department of Physics">Department of Physics</option>
+                        <option value="Department of Chemistry">Department of Chemistry</option>
+                        <option value="Department of Professional English">Department of Professional English</option>
+                        <option value="Department of Mathematics">Department of Mathematics</option>
+                        <option value="Department of MBA">Department of MBA</option>
+                        <option value="Department of Tamil">Department of Tamil</option>
                       </select>
                     </div>
                   </>
@@ -4079,6 +4094,10 @@ export default function App() {
                               <p className="text-white text-base font-bold">{user.full_name}</p>
                             </div>
                             <div>
+                              <span className="text-[10px] font-bold text-cyan-400 uppercase font-mono">Faculty ID / Login Credential</span>
+                              <p className="text-cyan-300 text-sm font-bold font-mono">{user.id || ("FAC-" + (user.college_email || "").split('@')[0].toUpperCase())}</p>
+                            </div>
+                            <div>
                               <span className="text-[10px] font-bold text-amber-400 uppercase font-mono">Degree Completion</span>
                               <p className="text-slate-200 text-sm font-semibold">{user.degree_completion || adminDegreeCompletion}</p>
                             </div>
@@ -4202,6 +4221,12 @@ export default function App() {
                               <option value="Civil Engineering (B.E)">Civil Engineering (B.E)</option>
                               <option value="Mechanical Engineering (B.E)">Mechanical Engineering (B.E)</option>
                               <option value="CyberSecurity (B.Tech)">CyberSecurity (B.Tech)</option>
+                              <option value="Department of Physics">Department of Physics</option>
+                              <option value="Department of Chemistry">Department of Chemistry</option>
+                              <option value="Department of Professional English">Department of Professional English</option>
+                              <option value="Department of Mathematics">Department of Mathematics</option>
+                              <option value="Department of MBA">Department of MBA</option>
+                              <option value="Department of Tamil">Department of Tamil</option>
                             </select>
                           </div>
                           <div>
@@ -4989,12 +5014,21 @@ export default function App() {
                                 onChange={(e) => setAdminTTDept(e.target.value)}
                                 className="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-2 text-white focus:outline-none"
                               >
-                                <option value="Computer Science Engineering (CSE B.E)">Computer Science Engineering (CSE)</option>
-                                <option value="Artificial Intelligence & Data Science (AI & DS)">AI & Data Science (AI & DS)</option>
-                                <option value="Electronics & Communication (ECE)">Electronics & Communication (ECE)</option>
-                                <option value="Mechanical Engineering">Mechanical Engineering</option>
-                                <option value="Civil Engineering">Civil Engineering</option>
-                                <option value="Computer Science & Business Systems (CSBS)">CSBS Dept</option>
+                                <option value="Computer Science Engineering (CSE B.E)">Computer Science Engineering (CSE B.E)</option>
+                                <option value="Artificial Intelligence and Data Science (AI&DS B.Tech)">Artificial Intelligence and Data Science (AI&DS B.Tech)</option>
+                                <option value="Artificial Intelligence and Machine Learning (AI&ML B.Tech)">Artificial Intelligence and Machine Learning (AI&ML B.Tech)</option>
+                                <option value="Computer Science and Business Systems (CSBS B.Tech)">Computer Science and Business Systems (CSBS B.Tech)</option>
+                                <option value="Electronics and Communication Engineering (ECE B.E)">Electronics and Communication Engineering (ECE B.E)</option>
+                                <option value="Electrical and Electronics Engineering (EEE B.E)">Electrical and Electronics Engineering (EEE B.E)</option>
+                                <option value="Civil Engineering (B.E)">Civil Engineering (B.E)</option>
+                                <option value="Mechanical Engineering (B.E)">Mechanical Engineering (B.E)</option>
+                                <option value="CyberSecurity (B.Tech)">CyberSecurity (B.Tech)</option>
+                                <option value="Department of Physics">Department of Physics</option>
+                                <option value="Department of Chemistry">Department of Chemistry</option>
+                                <option value="Department of Professional English">Department of Professional English</option>
+                                <option value="Department of Mathematics">Department of Mathematics</option>
+                                <option value="Department of MBA">Department of MBA</option>
+                                <option value="Department of Tamil">Department of Tamil</option>
                               </select>
                             </div>
 
@@ -5148,12 +5182,21 @@ export default function App() {
                                   onChange={(e) => setAdminStaffDept(e.target.value)}
                                   className="w-full bg-slate-900 border border-slate-850 rounded-xl px-2 py-1.5 text-white text-[10px]"
                                 >
-                                  <option value="Computer Science Engineering (CSE B.E)">CSE Dept</option>
-                                  <option value="Artificial Intelligence & Data Science (AI & DS)">AI & DS Dept</option>
-                                  <option value="Electronics & Communication (ECE)">ECE Dept</option>
-                                  <option value="Mechanical Engineering">Mech Dept</option>
-                                  <option value="Civil Engineering">Civil Dept</option>
-                                  <option value="Computer Science & Business Systems (CSBS)">CSBS Dept</option>
+                                  <option value="Computer Science Engineering (CSE B.E)">Computer Science Engineering (CSE B.E)</option>
+                                  <option value="Artificial Intelligence and Data Science (AI&DS B.Tech)">Artificial Intelligence and Data Science (AI&DS B.Tech)</option>
+                                  <option value="Artificial Intelligence and Machine Learning (AI&ML B.Tech)">Artificial Intelligence and Machine Learning (AI&ML B.Tech)</option>
+                                  <option value="Computer Science and Business Systems (CSBS B.Tech)">Computer Science and Business Systems (CSBS B.Tech)</option>
+                                  <option value="Electronics and Communication Engineering (ECE B.E)">Electronics and Communication Engineering (ECE B.E)</option>
+                                  <option value="Electrical and Electronics Engineering (EEE B.E)">Electrical and Electronics Engineering (EEE B.E)</option>
+                                  <option value="Civil Engineering (B.E)">Civil Engineering (B.E)</option>
+                                  <option value="Mechanical Engineering (B.E)">Mechanical Engineering (B.E)</option>
+                                  <option value="CyberSecurity (B.Tech)">CyberSecurity (B.Tech)</option>
+                                  <option value="Department of Physics">Department of Physics</option>
+                                  <option value="Department of Chemistry">Department of Chemistry</option>
+                                  <option value="Department of Professional English">Department of Professional English</option>
+                                  <option value="Department of Mathematics">Department of Mathematics</option>
+                                  <option value="Department of MBA">Department of MBA</option>
+                                  <option value="Department of Tamil">Department of Tamil</option>
                                 </select>
                               </div>
                             </div>
@@ -5274,12 +5317,21 @@ export default function App() {
                                 onChange={(e) => setAdminSylDept(e.target.value)}
                                 className="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-2 text-white focus:outline-none"
                               >
-                                <option value="Computer Science Engineering (CSE B.E)">Computer Science Engineering (CSE)</option>
-                                <option value="Artificial Intelligence & Data Science (AI & DS)">AI & Data Science (AI & DS)</option>
-                                <option value="Electronics & Communication (ECE)">Electronics & Communication (ECE)</option>
-                                <option value="Mechanical Engineering">Mechanical Engineering</option>
-                                <option value="Civil Engineering">Civil Engineering</option>
-                                <option value="Computer Science & Business Systems (CSBS)">CSBS Dept</option>
+                                <option value="Computer Science Engineering (CSE B.E)">Computer Science Engineering (CSE B.E)</option>
+                                <option value="Artificial Intelligence and Data Science (AI&DS B.Tech)">Artificial Intelligence and Data Science (AI&DS B.Tech)</option>
+                                <option value="Artificial Intelligence and Machine Learning (AI&ML B.Tech)">Artificial Intelligence and Machine Learning (AI&ML B.Tech)</option>
+                                <option value="Computer Science and Business Systems (CSBS B.Tech)">Computer Science and Business Systems (CSBS B.Tech)</option>
+                                <option value="Electronics and Communication Engineering (ECE B.E)">Electronics and Communication Engineering (ECE B.E)</option>
+                                <option value="Electrical and Electronics Engineering (EEE B.E)">Electrical and Electronics Engineering (EEE B.E)</option>
+                                <option value="Civil Engineering (B.E)">Civil Engineering (B.E)</option>
+                                <option value="Mechanical Engineering (B.E)">Mechanical Engineering (B.E)</option>
+                                <option value="CyberSecurity (B.Tech)">CyberSecurity (B.Tech)</option>
+                                <option value="Department of Physics">Department of Physics</option>
+                                <option value="Department of Chemistry">Department of Chemistry</option>
+                                <option value="Department of Professional English">Department of Professional English</option>
+                                <option value="Department of Mathematics">Department of Mathematics</option>
+                                <option value="Department of MBA">Department of MBA</option>
+                                <option value="Department of Tamil">Department of Tamil</option>
                               </select>
                             </div>
 
