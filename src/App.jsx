@@ -41,6 +41,41 @@ const safeStorage = {
   }
 };
 
+// Helper for department-specific filtering of timetables and staff schedules
+const matchesStudentDepartment = (itemDept, studentDept) => {
+  if (!itemDept || !studentDept) return true;
+  const item = itemDept.toLowerCase().trim();
+  const student = studentDept.toLowerCase().trim();
+
+  // Show if item is marked for All Departments / Freshers / General
+  if (item === 'all departments' || item === 'all' || item === 'freshers' || item === 'general') return true;
+
+  // Acronym & substring matching for departments
+  if (student.includes('ai&ds') || student.includes('data science') || student.includes('aids')) {
+    return item.includes('ai') || item.includes('ds') || item.includes('data science') || item.includes('aids');
+  }
+  if (student.includes('cse') || student.includes('computer science')) {
+    return item.includes('cse') || item.includes('computer science');
+  }
+  if (student.includes('ece') || student.includes('electronics')) {
+    return item.includes('ece') || item.includes('electronics');
+  }
+  if (student.includes('csbs') || student.includes('business systems')) {
+    return item.includes('csbs') || item.includes('business');
+  }
+  if (student.includes('mech') || student.includes('mechanical')) {
+    return item.includes('mech') || item.includes('mechanical');
+  }
+  if (student.includes('civil')) {
+    return item.includes('civil');
+  }
+  if (student.includes('cyber')) {
+    return item.includes('cyber');
+  }
+
+  return item.includes(student) || student.includes(item);
+};
+
 /* ==========================================================================
    3D BACKGROUND PARTICLE SYSTEM (Cyber-Cyan and Hot-Pink Stardust)
    ========================================================================== */
@@ -1359,6 +1394,20 @@ export default function App() {
       })
       .catch(err => console.warn("Todos loading failed:", err));
 
+    // 3. Fetch student isolated progress record (Continuation across logouts & devices)
+    if (!user.is_admin) {
+      fetch(`${API_BASE}/student/progress/${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.progress) {
+            if (data.progress.enrolled_skill_track) setEnrolledDomain(data.progress.enrolled_skill_track);
+            if (data.progress.active_roadmap_topic) setActiveRoadmapTopic(data.progress.active_roadmap_topic);
+            setStudentIsolatedProgress(data.progress);
+          }
+        })
+        .catch(err => console.warn("Student progress fetch error:", err));
+    }
+
     // Real-time synchronization polling for events, timetables, and syllabi
     const syncPortalData = () => {
       fetch(`${API_BASE}/events`)
@@ -1415,6 +1464,20 @@ export default function App() {
       safeStorage.setItem('cached_staff', JSON.stringify(staffScheduleList));
     }
   }, [staffScheduleList]);
+
+  // Persist student progress changes across logouts & devices
+  useEffect(() => {
+    if (!user || user.is_admin || !enrolledDomain) return;
+    fetch(`${API_BASE}/student/progress/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        student_id: user.id,
+        enrolled_skill_track: enrolledDomain,
+        active_roadmap_topic: activeRoadmapTopic
+      })
+    }).catch(err => console.warn("Auto save progress error:", err));
+  }, [enrolledDomain, activeRoadmapTopic, user]);
 
   const getVisibleClubs = () => {
     if (!user) return [];
@@ -3470,9 +3533,9 @@ export default function App() {
                         </div>
 
                         <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
-                          {masterTimetableList.filter(t => t.timetable_image_url || t.schedule_image_url).length > 0 ? (
+                          {masterTimetableList.filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || matchesStudentDepartment(t.department, user.department))).length > 0 ? (
                             masterTimetableList
-                              .filter(t => t.timetable_image_url || t.schedule_image_url)
+                              .filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || matchesStudentDepartment(t.department, user.department)))
                               .map((t, idx) => (
                                 <div key={idx} className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
                                   <div className="flex items-center justify-between">
@@ -3482,29 +3545,20 @@ export default function App() {
                                     </span>
                                   </div>
                                   <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
-                                    <img src={t.timetable_image_url || t.schedule_image_url} alt="1st Year Timetable Chart" className="w-full max-h-72 object-contain rounded-lg" />
+                                    <img src={t.timetable_image_url || t.schedule_image_url} alt="Class Timetable Chart" className="w-full max-h-72 object-contain rounded-lg" />
                                   </div>
                                 </div>
                               ))
                           ) : (
-                            /* Default 1st Year Timetable Image Gallery */
+                            /* Department specific default schedule */
                             <div className="space-y-4">
                               <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
                                 <div className="flex items-center justify-between">
-                                  <h5 className="font-bold text-white text-xs">1st Year CSE & General Engineering Class Timetable</h5>
-                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">1st Year CSE</span>
+                                  <h5 className="font-bold text-white text-xs">{user.department || 'Department'} Class Schedule</h5>
+                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">{user.department || 'General'}</span>
                                 </div>
                                 <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
-                                  <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop" alt="1st Year CSE Timetable" className="w-full max-h-64 object-contain rounded-lg" />
-                                </div>
-                              </div>
-                              <div className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-2">
-                                <div className="flex items-center justify-between">
-                                  <h5 className="font-bold text-white text-xs">1st Year AI & DS Class Schedule Diagram</h5>
-                                  <span className="text-[9px] bg-purple-500/20 text-purple-300 font-mono font-bold px-2 py-0.5 rounded">1st Year AI & DS</span>
-                                </div>
-                                <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
-                                  <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop" alt="1st Year AI&DS Timetable" className="w-full max-h-64 object-contain rounded-lg" />
+                                  <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop" alt="Class Timetable" className="w-full max-h-64 object-contain rounded-lg" />
                                 </div>
                               </div>
                             </div>
@@ -3512,53 +3566,47 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* 1st Year Faculty Records & Schedules (Right 1 col) */}
+                      {/* 1st Year Faculty Records & Schedules (Right 1 col - Department Filtered) */}
                       <div className="space-y-4">
                         <span className="text-xs font-bold text-purple-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
                           <Users className="w-4 h-4" />
-                          1st Year Subject Faculty
+                          {user.is_admin ? "All Faculty Schedules" : `${user.department || 'Department'} Faculty`}
                         </span>
 
                         <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 no-scrollbar">
-                          {staffScheduleList.length > 0 ? (
-                            staffScheduleList.map((f, idx) => (
-                              <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">
-                                <div className="flex items-center gap-3">
-                                  <img 
-                                    src={f.schedule_image_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"} 
-                                    alt={f.staff_name} 
-                                    className="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0" 
-                                  />
-                                  <div>
-                                    <h4 className="font-bold text-white text-xs">{f.staff_name}</h4>
-                                    <p className="text-[9px] text-amber-400 font-mono">{f.designation}</p>
-                                    <p className="text-[9px] text-slate-400 truncate max-w-[150px]">{f.department}</p>
+                          {staffScheduleList.filter(f => user.is_admin || matchesStudentDepartment(f.department, user.department)).length > 0 ? (
+                            staffScheduleList
+                              .filter(f => user.is_admin || matchesStudentDepartment(f.department, user.department))
+                              .map((f, idx) => (
+                                <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">
+                                  <div className="flex items-center gap-3">
+                                    <img 
+                                      src={f.schedule_image_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"} 
+                                      alt={f.staff_name} 
+                                      className="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0" 
+                                    />
+                                    <div>
+                                      <h4 className="font-bold text-white text-xs">{f.staff_name}</h4>
+                                      <p className="text-[9px] text-amber-400 font-mono">{f.designation}</p>
+                                      <p className="text-[9px] text-slate-400 truncate max-w-[150px]">{f.department}</p>
+                                    </div>
+                                  </div>
+                                  <div className="bg-slate-950 p-2 rounded-xl border border-white/5 text-[9px] font-mono space-y-1">
+                                    <p className="text-emerald-400 font-bold">📚 {f.assigned_subjects || "Core Subjects"}</p>
+                                    <p className="text-slate-300">⏰ {f.available_hours}</p>
                                   </div>
                                 </div>
-                                <div className="bg-slate-950 p-2 rounded-xl border border-white/5 text-[9px] font-mono space-y-1">
-                                  <p className="text-emerald-400 font-bold">📚 {f.assigned_subjects || "1st Year Core Subjects"}</p>
-                                  <p className="text-slate-300">⏰ {f.available_hours}</p>
-                                </div>
-                              </div>
-                            ))
+                              ))
                           ) : (
-                            /* Default 1st Year Faculty Seeds */
+                            /* Default Faculty Seeds */
                             [
                               {
                                 name: "Dr. A. K. Sharma",
                                 desig: "Senior Professor & HOD",
-                                dept: "Computer Science (1st Year)",
-                                subj: "CS101: Problem Solving & Data Structures",
+                                dept: user.department || "Computer Science",
+                                subj: "Core Dept Subjects & Labs",
                                 hours: "Mon, Wed, Fri: 10:00 AM - 12:30 PM",
                                 img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"
-                              },
-                              {
-                                name: "Prof. Priya Sen",
-                                desig: "1st Year Coordinator",
-                                dept: "AI & Data Science (1st Year)",
-                                subj: "AD101: Foundations of AI",
-                                hours: "Tue, Thu: 02:00 PM - 04:30 PM",
-                                img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop"
                               }
                             ].map((f, idx) => (
                               <div key={idx} className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-2">

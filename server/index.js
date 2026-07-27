@@ -426,6 +426,39 @@ app.post('/api/auth/sso/login', async (req, res) => {
   });
 });
 
+/* ==========================================================================
+   STUDENT PROGRESS & CONTINUATION ENDPOINTS
+   ========================================================================== */
+
+app.post('/api/student/progress/save', async (req, res) => {
+  const { student_id, enrolled_skill_track, active_roadmap_topic, eager_events, registered_events, completed_todos } = req.body;
+  if (!student_id) return res.status(400).json({ error: "student_id is required." });
+
+  const db = await readDB();
+  if (!db.student_progress) db.student_progress = {};
+
+  const existing = db.student_progress[student_id] || { student_id };
+  db.student_progress[student_id] = {
+    ...existing,
+    enrolled_skill_track: enrolled_skill_track !== undefined ? enrolled_skill_track : existing.enrolled_skill_track,
+    active_roadmap_topic: active_roadmap_topic !== undefined ? active_roadmap_topic : existing.active_roadmap_topic,
+    eager_events: eager_events !== undefined ? eager_events : existing.eager_events,
+    registered_events: registered_events !== undefined ? registered_events : existing.registered_events,
+    completed_todos: completed_todos !== undefined ? completed_todos : existing.completed_todos,
+    updated_at: new Date().toISOString()
+  };
+
+  await writeDB(db);
+  res.json({ success: true, progress: db.student_progress[student_id] });
+});
+
+app.get('/api/student/progress/:studentId', async (req, res) => {
+  const { studentId } = req.params;
+  const db = await readDB();
+  const progress = (db.student_progress && db.student_progress[studentId]) || { student_id: studentId };
+  res.json({ progress });
+});
+
 // Email Sender Simulator
 const sendEmailNotification = async (recipientEmail, subject, body) => {
   const resendKey = process.env.RESEND_API_KEY || '';
@@ -1175,6 +1208,7 @@ app.post('/api/todo/delete', async (req, res) => {
 
 app.get('/api/events', async (req, res) => {
   const db = await readDB();
+  const now = new Date();
   
   if (!db.events || db.events.length === 0) {
     db.events = [
@@ -1186,6 +1220,7 @@ app.get('/api/events', async (req, res) => {
         organizer: "CSE Dept",
         date_string: "Ongoing (Ends in 4 hrs)",
         is_ongoing: true,
+        deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
         poster_url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop",
         registration_link: ""
       },
@@ -1197,6 +1232,7 @@ app.get('/api/events', async (req, res) => {
         organizer: "ECE Dept",
         date_string: "Ongoing (Live Session)",
         is_ongoing: true,
+        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
         poster_url: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop",
         registration_link: ""
       },
@@ -1206,26 +1242,46 @@ app.get('/api/events', async (req, res) => {
         title: "Web3 Smart Contracts & Auditing",
         description: "Learn Solidity compile patterns and test smart contract vulnerabilities. Organized by CSBS Dept.",
         organizer: "CSBS Dept",
-        date_string: "July 25",
+        date_string: "August 2026",
         is_ongoing: false,
+        deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
         poster_url: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop",
         registration_link: "https://ethereum.org"
       }
     ];
     await writeDB(db);
+  } else {
+    // AUTOMATIC DEADLINE EXPIRY CLEANER: Delete events whose registration deadline is reached
+    const initialCount = db.events.length;
+    db.events = db.events.filter(ev => {
+      if (!ev.deadline) return true;
+      const deadlineDate = new Date(ev.deadline);
+      return isNaN(deadlineDate.getTime()) || deadlineDate > now;
+    });
+
+    if (db.events.length < initialCount) {
+      console.log(`🧹 [AUTO CLEANUP] Automatically deleted ${initialCount - db.events.length} event(s) past registration deadline.`);
+      await logIncident(db, 'EVENT_DEADLINE_EXPIRED', 'Expired Events Auto-Deleted', `System automatically removed ${initialCount - db.events.length} event(s) whose registration deadline was reached.`, 'Auto Expiry Cleaner');
+      await writeDB(db);
+    }
   }
 
   res.json({ events: db.events });
 });
 
 app.post('/api/events', async (req, res) => {
-  const { type, title, description, organizer, date_string, registration_link, is_ongoing, poster_url } = req.body;
+  const { type, title, description, organizer, date_string, registration_link, is_ongoing, poster_url, deadline } = req.body;
   if (!title || !description || !organizer) {
     return res.status(400).json({ error: "Title, description, and organizer are required." });
   }
 
   const db = await readDB();
   if (!db.events) db.events = [];
+
+  // Default registration deadline to 7 days from now if not provided
+  const resolvedDeadline = deadline && !isNaN(new Date(deadline).getTime()) 
+    ? new Date(deadline).toISOString() 
+    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
   const newEvent = {
     id: "ev-" + Math.random().toString(36).substr(2, 9),
@@ -1235,6 +1291,7 @@ app.post('/api/events', async (req, res) => {
     organizer,
     date_string: date_string || "TBA",
     is_ongoing: !!is_ongoing,
+    deadline: resolvedDeadline,
     poster_url: poster_url || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop",
     registration_link: registration_link || "",
     created_at: new Date().toISOString()
@@ -1248,7 +1305,7 @@ app.post('/api/events', async (req, res) => {
     id: "notif-" + Math.random().toString(36).substr(2, 9),
     type: "event",
     title: `📣 New Event: ${title}`,
-    body: `${type} event announced by ${organizer}. Check the Events portal option to view poster and register!`,
+    body: `${type} event announced by ${organizer}. Registration open until ${new Date(resolvedDeadline).toLocaleDateString()}. Check Events portal option to view poster!`,
     created_at: new Date().toISOString()
   });
 
