@@ -2953,17 +2953,44 @@ export default function App() {
                     </div>
                   </>
                 ) : (
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">Faculty ID / Password</label>
-                    <input 
-                      type="password"
-                      placeholder="Enter Faculty Password"
-                      required
-                      value={adminPassword}
-                      onChange={(e) => setAdminPassword(e.target.value)}
-                      className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all font-mono"
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">Faculty ID / Password</label>
+                      <input 
+                        type="password"
+                        placeholder="Enter Faculty Password"
+                        required
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                        className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">Select Faculty Department</label>
+                      <select 
+                        value={loginDepartment}
+                        onChange={(e) => setLoginDepartment(e.target.value)}
+                        className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-500 transition-all font-sans"
+                      >
+                        <option value="Computer Science Engineering (CSE B.E)">Computer Science Engineering (CSE B.E)</option>
+                        <option value="Artificial Intelligence and Data Science (AI&DS B.Tech)">Artificial Intelligence and Data Science (AI&DS B.Tech)</option>
+                        <option value="Artificial Intelligence and Machine Learning (AI&ML B.Tech)">Artificial Intelligence and Machine Learning (AI&ML B.Tech)</option>
+                        <option value="Computer Science and Business Systems (CSBS B.Tech)">Computer Science and Business Systems (CSBS B.Tech)</option>
+                        <option value="Electronics and Communication Engineering (ECE B.E)">Electronics and Communication Engineering (ECE B.E)</option>
+                        <option value="Electrical and Electronics Engineering (EEE B.E)">Electrical and Electronics Engineering (EEE B.E)</option>
+                        <option value="Civil Engineering (B.E)">Civil Engineering (B.E)</option>
+                        <option value="Mechanical Engineering (B.E)">Mechanical Engineering (B.E)</option>
+                        <option value="CyberSecurity (B.Tech)">CyberSecurity (B.Tech)</option>
+                        <option value="Department of Physics">Department of Physics</option>
+                        <option value="Department of Chemistry">Department of Chemistry</option>
+                        <option value="Department of Professional English">Department of Professional English</option>
+                        <option value="Department of Mathematics">Department of Mathematics</option>
+                        <option value="Department of MBA">Department of MBA</option>
+                        <option value="Department of Tamil">Department of Tamil</option>
+                      </select>
+                    </div>
+                  </>
                 )}
 
                 <div className="pt-2">
@@ -4229,19 +4256,21 @@ export default function App() {
                               <option value="Department of Tamil">Department of Tamil</option>
                             </select>
                           </div>
-                          <div>
-                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Current College Year</label>
-                            <select 
-                              value={editCollegeYear}
-                              onChange={(e) => setEditCollegeYear(e.target.value)}
-                              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-purple-500"
-                            >
-                              <option value="1st Year">1st Year (Freshman)</option>
-                              <option value="2nd Year">2nd Year (Sophomore)</option>
-                              <option value="3rd Year">3rd Year (Junior)</option>
-                              <option value="4th Year">4th Year (Senior)</option>
-                            </select>
-                          </div>
+                          {!user.is_admin && (
+                            <div>
+                              <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Current College Year</label>
+                              <select 
+                                value={editCollegeYear}
+                                onChange={(e) => setEditCollegeYear(e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-purple-500"
+                              >
+                                <option value="1st Year">1st Year (Freshman)</option>
+                                <option value="2nd Year">2nd Year (Sophomore)</option>
+                                <option value="3rd Year">3rd Year (Junior)</option>
+                                <option value="4th Year">4th Year (Senior)</option>
+                              </select>
+                            </div>
+                          )}
                           <div>
                             <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Academic Interests (comma separated)</label>
                             <input 
