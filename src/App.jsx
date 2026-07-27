@@ -3526,12 +3526,12 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Division Selector Buttons */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+                    {/* Division Selector Buttons (3 Divisions: Syllabus, Staff, Class Time Table) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <button 
                         type="button"
                         onClick={() => setAcademicsSubTab('syllabus')}
-                        className={`py-3 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'syllabus' ? 'bg-blue-600 text-white shadow-lg neon-glow-blue border border-blue-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
+                        className={`py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'syllabus' ? 'bg-blue-600 text-white shadow-lg neon-glow-blue border border-blue-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
                       >
                         <BookOpenCheck className="w-4 h-4 text-blue-300" />
                         <span>1. Syllabus</span>
@@ -3539,29 +3539,20 @@ export default function App() {
 
                       <button 
                         type="button"
-                        onClick={() => setAcademicsSubTab('subjects')}
-                        className={`py-3 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'subjects' ? 'bg-emerald-600 text-white shadow-lg neon-glow-emerald border border-emerald-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
-                      >
-                        <BookOpen className="w-4 h-4 text-emerald-300" />
-                        <span>2. Subjects</span>
-                      </button>
-
-                      <button 
-                        type="button"
                         onClick={() => setAcademicsSubTab('staffs')}
-                        className={`py-3 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'staffs' ? 'bg-amber-600 text-white shadow-lg neon-glow-orange border border-amber-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
+                        className={`py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'staffs' ? 'bg-amber-600 text-white shadow-lg neon-glow-orange border border-amber-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
                       >
                         <Users className="w-4 h-4 text-amber-300" />
-                        <span>3. Staffs</span>
+                        <span>2. Staff</span>
                       </button>
 
                       <button 
                         type="button"
                         onClick={() => setAcademicsSubTab('timetable')}
-                        className={`py-3 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'timetable' ? 'bg-cyan-600 text-white shadow-lg neon-glow-cyan border border-cyan-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
+                        className={`py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'timetable' ? 'bg-cyan-600 text-white shadow-lg neon-glow-cyan border border-cyan-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
                       >
                         <Clock className="w-4 h-4 text-cyan-300" />
-                        <span>4. Class Time Table</span>
+                        <span>3. Class Time Table</span>
                       </button>
                     </div>
                   </TiltCard3D>
@@ -3640,70 +3631,6 @@ export default function App() {
                           <p className="text-[10px] text-slate-500">When Admin posts new syllabus documents in Admin Hub, they will display live right here!</p>
                         </div>
                       )}
-                    </TiltCard3D>
-                  )}
-
-                  {/* DIVISION 2: SUBJECTS */}
-                  {academicsSubTab === 'subjects' && (
-                    <TiltCard3D className="p-6 space-y-6">
-                      <div className="pb-4 border-b border-white/5 flex flex-wrap justify-between items-center gap-3">
-                        <div>
-                          <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                            <BookOpen className="w-4 h-4 text-emerald-400" />
-                            Course Subjects & Learning Modules
-                          </h4>
-                          <p className="text-[10px] text-slate-400 mt-0.5">Subject courses and reference preparation modules for {user.department}</p>
-                        </div>
-                        <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono font-bold px-2.5 py-1 rounded">
-                          Curriculum Courses
-                        </span>
-                      </div>
-
-                      <div className="space-y-4">
-                        {academicsDatabase[user.department] ? (
-                          academicsDatabase[user.department].subjects.map((sub, idx) => (
-                            <div key={idx} className="p-5 bg-white/5 rounded-2xl border border-white/5 space-y-4">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <span className="text-[9px] bg-slate-800 text-slate-400 border border-slate-700 px-2 py-0.5 rounded font-mono font-bold">
-                                    {sub.code}
-                                  </span>
-                                  <h4 className="text-sm font-bold text-white mt-1.5">{sub.name}</h4>
-                                </div>
-                                {sub.syllabus && (
-                                  <button 
-                                    onClick={() => setMaximizedSyllabus(sub)}
-                                    className="btn-3d btn-3d-blue px-3 py-1.5 text-[9px] text-white shadow-md cursor-pointer"
-                                  >
-                                    🔍 View Syllabus Units
-                                  </button>
-                                )}
-                              </div>
-                              <p className="text-xs text-slate-400 leading-relaxed">{sub.desc}</p>
-                              
-                              {/* Prep Video Recommendation */}
-                              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px]">
-                                <div className="flex items-center gap-2 text-slate-300">
-                                  <Video className="w-4 h-4 text-rose-500" />
-                                  <span className="font-semibold truncate max-w-[250px]">{sub.videoTitle} ({sub.channel})</span>
-                                </div>
-                                <a 
-                                  href={sub.videoLink} 
-                                  target="_blank" 
-                                  rel="noreferrer" 
-                                  className="btn-3d btn-3d-rose px-3 py-1.5 text-[9px] text-white shadow-md shrink-0"
-                                >
-                                  Watch Lesson Video
-                                </a>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center text-xs text-slate-500 py-12 italic">
-                            No specific subject list set for this department. Defaulting general engineering math lessons.
-                          </div>
-                        )}
-                      </div>
                     </TiltCard3D>
                   )}
 
@@ -4994,7 +4921,7 @@ export default function App() {
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
-                        📚 Subjects & Syllabus
+                        📚 Syllabus
                       </button>
                       <button 
                         onClick={() => { setAdminSubTab('audit_logs'); fetchAuditLogs(); }}
