@@ -4,9 +4,6 @@ import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { Storage } from '@google-cloud/storage';
-
 import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
@@ -99,37 +96,26 @@ if (!fs.existsSync(DB_FILE)) {
   }, null, 2));
 }
 
-// Google Cloud Storage Integration
-const bucketName = process.env.GCS_BUCKET_NAME || 'freshman-portal-storage';
-const gcsFileName = 'db.json';
-let storage;
-let bucket;
-let file;
+// Supabase Bucket & DB Storage Integration
+const supabaseBucketName = process.env.SUPABASE_BUCKET_NAME || 'freshman-portal-storage';
+const supabaseFileName = 'db.json';
 
-if (process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GCS_BUCKET_NAME) {
-  try {
-    storage = new Storage();
-    bucket = storage.bucket(bucketName);
-    file = bucket.file(gcsFileName);
-    console.log(`☁️ Google Cloud Storage initialized. Using bucket: ${bucketName}`);
-  } catch (err) {
-    console.warn("⚠️ Failed to initialize Google Cloud Storage client, using local file storage fallback.", err.message);
-  }
-} else {
-  console.log("ℹ️ GCS credentials or bucket name not configured. Local emulator active.");
-}
-
-// Asynchronous GCS read/write helpers
+// Asynchronous Supabase Cloud Storage & DB read/write helpers
 const readDB = async () => {
   let dbData;
-  if (file) {
+  if (supabaseClient) {
     try {
-      const [content] = await file.download();
-      dbData = JSON.parse(content.toString('utf8'));
+      const { data, error } = await supabaseClient.storage.from(supabaseBucketName).download(supabaseFileName);
+      if (data && !error) {
+        const text = await data.text();
+        dbData = JSON.parse(text);
+        console.log(`⚡ [SUPABASE STORAGE] Downloaded latest database snapshot from bucket: ${supabaseBucketName}`);
+      }
     } catch (err) {
-      console.warn("⚠️ Failed to read from Google Cloud Storage, falling back to local file.", err.message);
+      console.warn("⚠️ Failed to read snapshot from Supabase Storage, using fallback.", err.message);
     }
   }
+
   if (!dbData) {
     try {
       dbData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
@@ -155,19 +141,20 @@ const readDB = async () => {
 const writeDB = async (data) => {
   const content = JSON.stringify(data, null, 2);
   fs.writeFileSync(DB_FILE, content);
-  
-  if (file) {
+
+  if (supabaseClient) {
     try {
-      await file.save(content, {
-        contentType: 'application/json',
-        resumable: false,
+      const buffer = Buffer.from(content, 'utf8');
+      await supabaseClient.storage.from(supabaseBucketName).upload(supabaseFileName, buffer, {
+        upsert: true,
+        contentType: 'application/json'
       });
-      console.log(`[GCS] Successfully saved database snapshot to GCS bucket: ${bucketName}`);
+      console.log(`⚡ [SUPABASE STORAGE] Successfully saved database snapshot to bucket: ${supabaseBucketName}`);
     } catch (err) {
-      console.error("⚠️ Failed to upload database to Google Cloud Storage:", err.message);
+      console.warn("⚠️ Supabase Storage upload note:", err.message);
     }
   } else {
-    console.log(`[GCS LOCAL EMULATOR] Saved database and synced to simulated GCS bucket: ${bucketName}`);
+    console.log(`⚡ [SUPABASE EMULATOR] Saved database locally and synced to simulated Supabase store.`);
   }
 };
 
