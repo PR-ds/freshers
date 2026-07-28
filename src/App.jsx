@@ -3,7 +3,7 @@ import {
   BookOpen, Calendar, MessageSquare, User, Users, Bell, 
   Play, ShieldAlert, Sparkles, Send, CheckCircle2, ChevronRight,
   TrendingUp, Award, Layers, LogOut, ArrowRight, Terminal, Video,
-  BookOpenCheck, Clock, FileText, UserCheck, Maximize2, Minimize2, Search, Plus,
+  BookOpenCheck, Clock, FileText, UserCheck, Maximize2, Minimize2, Search, Plus, Trash2,
   Cpu, Compass, Settings, Key, Hourglass, Lock, Unlock, CheckSquare
 } from 'lucide-react';
 import * as THREE from 'three';
@@ -1056,6 +1056,7 @@ export default function App() {
   const [adminStaffHours, setAdminStaffHours] = useState('Mon, Wed, Fri: 10:00 AM - 12:30 PM');
   const [adminStaffSubjects, setAdminStaffSubjects] = useState('Data Structures, Algorithms');
   const [adminStaffImage, setAdminStaffImage] = useState('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop');
+  const [adminStaffPhoto, setAdminStaffPhoto] = useState('');
 
   // Admin Syllabus & Subjects States (Years 1 to 4 & All Depts)
   const [adminSylDept, setAdminSylDept] = useState('Computer Science Engineering (CSE B.E)');
@@ -1532,6 +1533,19 @@ export default function App() {
         ...club,
         displayOrganizer: (user.department || "").split(' (')[0]
       }));
+    }
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    try {
+      setEventsList(prev => prev.filter(ev => ev.id !== eventId));
+      await fetch(`${API_BASE}/events/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: eventId })
+      });
+    } catch (err) {
+      console.warn("Delete event error:", err);
     }
   };
 
@@ -2900,7 +2914,7 @@ export default function App() {
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">Student Full Name</label>
                     <input 
                       type="text" 
-                      placeholder="e.g. Alex Morgan"
+                      placeholder="enter your name"
                       required
                       value={loginStudentName}
                       onChange={(e) => setLoginStudentName(e.target.value)}
@@ -2912,7 +2926,7 @@ export default function App() {
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">Faculty Admin Name</label>
                     <input 
                       type="text" 
-                      placeholder="e.g. Dr. A. K. Sharma"
+                      placeholder="name"
                       required
                       value={loginAdminName}
                       onChange={(e) => setLoginAdminName(e.target.value)}
@@ -2927,7 +2941,7 @@ export default function App() {
                   </label>
                   <input 
                     type="email" 
-                    placeholder={loginRole === 'admin' ? "e.g. faculty@college.ac.in" : "e.g. student@gmail.com, student@ac.in"}
+                    placeholder="email"
                     required
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
@@ -2941,7 +2955,7 @@ export default function App() {
                       <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">Class Batch Code</label>
                       <input 
                         type="text"
-                        placeholder="e.g. 2026-CS"
+                        placeholder="batch no"
                         required
                         value={loginBatchNo}
                         onChange={(e) => setLoginBatchNo(e.target.value)}
@@ -2992,7 +3006,7 @@ export default function App() {
                       <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 font-mono">Faculty ID / Password</label>
                       <input 
                         type="password"
-                        placeholder="Enter Faculty Password"
+                        placeholder="id"
                         required
                         value={adminPassword}
                         onChange={(e) => setAdminPassword(e.target.value)}
@@ -5104,9 +5118,19 @@ export default function App() {
                                     </div>
                                     <h5 className="font-bold text-white text-sm mt-1">{ev.title}</h5>
                                     <p className="text-[10px] text-slate-400 leading-relaxed mt-1">{ev.description}</p>
-                                    <div className="flex flex-wrap items-center gap-4 mt-2 text-[10px] text-slate-400 font-mono">
-                                      <span>📅 {ev.date_string}</span>
-                                      <span>🏛️ {ev.organizer}</span>
+                                    <div className="flex flex-wrap items-center justify-between gap-4 mt-2 text-[10px] text-slate-400 font-mono">
+                                      <div className="flex items-center gap-4">
+                                        <span>📅 {ev.date_string}</span>
+                                        <span>🏛️ {ev.organizer}</span>
+                                      </div>
+                                      <button 
+                                        onClick={() => handleDeleteEvent(ev.id)}
+                                        className="p-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/30 rounded-lg transition-all flex items-center gap-1 text-[9px] font-bold cursor-pointer"
+                                        title="Delete Event & Poster"
+                                      >
+                                        <Trash2 className="w-3 h-3 text-rose-400" />
+                                        <span>Delete Poster & Event</span>
+                                      </button>
                                     </div>
                                   </div>
                                 </div>
@@ -5377,6 +5401,22 @@ export default function App() {
                                 onChange={(e) => setAdminStaffHours(e.target.value)}
                                 className="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-2 text-white"
                               />
+                            </div>
+
+                             <div>
+                              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 font-mono">Upload Staff Profile Photo / Image</label>
+                              <input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={(e) => handleFileImportToDataUrl(e, setAdminStaffPhoto)}
+                                className="w-full bg-slate-900 border border-slate-850 rounded-xl px-3 py-1.5 text-white text-xs file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer font-mono"
+                              />
+                              {adminStaffPhoto && (
+                                <div className="mt-2 relative rounded-xl overflow-hidden border border-white/10 p-2 bg-slate-950 flex items-center gap-3">
+                                  <img src={adminStaffPhoto} alt="Staff photo" className="w-12 h-12 object-cover rounded-full border border-emerald-400/40" />
+                                  <span className="text-[9px] text-emerald-300 font-mono font-bold">Staff Profile Photo Loaded</span>
+                                </div>
+                              )}
                             </div>
 
                             <div>

@@ -1484,6 +1484,17 @@ app.post('/api/events', async (req, res) => {
   res.json({ success: true, event: newEvent });
 });
 
+app.post('/api/events/delete', async (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).json({ error: "Event id is required." });
+
+  const db = await readDB();
+  if (!db.events) db.events = [];
+  db.events = db.events.filter(e => e.id !== id);
+  await writeDB(db);
+  res.json({ success: true });
+});
+
 app.post('/api/events/register', async (req, res) => {
   const { event_id, team_name, members } = req.body;
   if (!event_id || !team_name || !members || !Array.isArray(members) || members.length === 0) {
