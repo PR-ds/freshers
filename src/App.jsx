@@ -970,9 +970,9 @@ export default function App() {
     }
   });
   const [token, setToken] = useState(() => safeStorage.getItem('portal_token') || null);
-  const [loginEmail, setLoginEmail] = useState('student@college.edu');
+  const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [loginBatchNo, setLoginBatchNo] = useState('2026-CS');
+  const [loginBatchNo, setLoginBatchNo] = useState('');
   const [loginDepartment, setLoginDepartment] = useState('Computer Science Engineering (CSE B.E)');
   const [loginSection, setLoginSection] = useState('Section A');
   const [loginOTP, setLoginOTP] = useState('');
@@ -983,21 +983,13 @@ export default function App() {
 
   // New Student and Admin states & Login Names
   const [loginRole, setLoginRole] = useState('student'); // 'student' | 'admin'
-  const [loginStudentName, setLoginStudentName] = useState('Alex Morgan');
-  const [loginAdminName, setLoginAdminName] = useState('Dr. A. K. Sharma');
+  const [loginStudentName, setLoginStudentName] = useState('');
+  const [loginAdminName, setLoginAdminName] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
 
   // Admin Profile Details
   const [adminDegreeCompletion, setAdminDegreeCompletion] = useState('Ph.D in Computer Science & Engineering (M.E/M.Tech)');
   const [adminExperience, setAdminExperience] = useState('14+ Years Senior Professor & Department Chair');
-
-  useEffect(() => {
-    if (loginRole === 'student') {
-      setLoginEmail('student@college.edu');
-    } else {
-      setLoginEmail('staff@college.edu');
-    }
-  }, [loginRole]);
 
   const [todos, setTodos] = useState([]);
   const [newTodoText, setNewTodoText] = useState('');
