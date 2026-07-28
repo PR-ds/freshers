@@ -85,14 +85,20 @@ const matchesStudentDepartment = (itemDept, studentDept) => {
   return item.includes(student) || student.includes(item);
 };
 
-// Helper for section-specific filtering of timetables and staff schedules
 const matchesStudentSection = (itemSection, studentSection) => {
   if (!itemSection || !studentSection) return true;
   const item = itemSection.toLowerCase().trim();
   const student = studentSection.toLowerCase().trim();
   if (item.includes('both') || item.includes('all')) return true;
-  if (student.includes('a') && item.includes('a')) return true;
-  if (student.includes('b') && item.includes('b')) return true;
+
+  const isItemA = item.includes('section a') || item.endsWith(' a') || item === 'a';
+  const isItemB = item.includes('section b') || item.endsWith(' b') || item === 'b';
+  const isStudentA = student.includes('section a') || student.endsWith(' a') || student === 'a';
+  const isStudentB = student.includes('section b') || student.endsWith(' b') || student === 'b';
+
+  if (isStudentA && isItemA) return true;
+  if (isStudentB && isItemB) return true;
+
   return item.includes(student) || student.includes(item);
 };
 
@@ -3575,60 +3581,61 @@ export default function App() {
                           <p className="text-[10px] text-slate-400 mt-0.5">Strictly displaying official syllabus uploaded by Admin for {user.department}</p>
                         </div>
                         <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2.5 py-1 rounded font-mono">
-                          Admin Synced Syllabus
+                          Admin Synced Syllabus ({masterSyllabusList.length})
                         </span>
                       </div>
 
                       {/* Display Published Syllabus */}
-                      {masterSyllabusList.filter(s => user.is_admin || matchesStudentDepartment(s.department, user.department)).length > 0 ? (
+                      {masterSyllabusList.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {masterSyllabusList
-                            .filter(s => user.is_admin || matchesStudentDepartment(s.department, user.department))
-                            .map((s, idx) => (
-                              <div key={idx} className="p-5 bg-slate-950/80 rounded-2xl border border-white/10 space-y-4">
-                                <div className="flex justify-between items-start">
-                                  <div>
-                                    <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">
-                                      {s.subject_code || "CS101"}
-                                    </span>
-                                    <h5 className="font-bold text-white text-sm mt-1">{s.subject_name}</h5>
-                                  </div>
-                                  <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono font-bold px-2 py-0.5 rounded">
-                                    {s.credits || 4} Credits
+                          {(masterSyllabusList.filter(s => user.is_admin || matchesStudentDepartment(s.department, user.department)).length > 0 
+                            ? masterSyllabusList.filter(s => user.is_admin || matchesStudentDepartment(s.department, user.department))
+                            : masterSyllabusList
+                          ).map((s, idx) => (
+                            <div key={idx} className="p-5 bg-slate-950/80 rounded-2xl border border-white/10 space-y-4">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">
+                                    {s.subject_code || "CS101"}
                                   </span>
+                                  <h5 className="font-bold text-white text-sm mt-1">{s.subject_name}</h5>
                                 </div>
-
-                                <p className="text-[10px] text-slate-400 font-mono">Dept: {s.department} • Year: {s.year || "1st Year"}</p>
-
-                                {/* Units List */}
-                                {Array.isArray(s.units) && s.units.length > 0 && (
-                                  <div className="space-y-1.5 pt-2 border-t border-white/5">
-                                    <span className="text-[10px] font-bold text-cyan-400 uppercase font-mono">Curriculum Units:</span>
-                                    {s.units.map((unit, uIdx) => (
-                                      <div key={uIdx} className="p-2 bg-white/5 rounded-xl border border-white/5 text-xs text-slate-300 flex items-center gap-2">
-                                        <span className="text-cyan-400 font-mono font-bold text-[10px]">•</span>
-                                        <span>{unit}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-
-                                {/* Syllabus Document Image */}
-                                {s.syllabus_image_url && (
-                                  <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2 mt-3">
-                                    <span className="text-[9px] text-cyan-300 font-mono font-bold block mb-1">Official Syllabus Document / Diagram:</span>
-                                    <img src={s.syllabus_image_url} alt={s.subject_name} className="w-full max-h-64 object-contain rounded-lg" />
-                                    <button 
-                                      onClick={() => setMaximizedPoster({ title: `${s.subject_name} Syllabus Document`, poster_url: s.syllabus_image_url, type: 'Syllabus Document', organizer: s.department })}
-                                      className="absolute bottom-2.5 right-2.5 p-1.5 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer"
-                                      title="Maximize Syllabus Diagram"
-                                    >
-                                      <Maximize2 className="w-3.5 h-3.5 text-blue-400" />
-                                    </button>
-                                  </div>
-                                )}
+                                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono font-bold px-2 py-0.5 rounded">
+                                  {s.credits || 4} Credits
+                                </span>
                               </div>
-                            ))}
+
+                              <p className="text-[10px] text-slate-400 font-mono">Dept: {s.department} • Year: {s.year || "1st Year"}</p>
+
+                              {/* Units List */}
+                              {Array.isArray(s.units) && s.units.length > 0 && (
+                                <div className="space-y-1.5 pt-2 border-t border-white/5">
+                                  <span className="text-[10px] font-bold text-cyan-400 uppercase font-mono">Curriculum Units:</span>
+                                  {s.units.map((unit, uIdx) => (
+                                    <div key={uIdx} className="p-2 bg-white/5 rounded-xl border border-white/5 text-xs text-slate-300 flex items-center gap-2">
+                                      <span className="text-cyan-400 font-mono font-bold text-[10px]">•</span>
+                                      <span>{unit}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Syllabus Document Image */}
+                              {s.syllabus_image_url && (
+                                <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2 mt-3">
+                                  <span className="text-[9px] text-cyan-300 font-mono font-bold block mb-1">Official Syllabus Document / Diagram:</span>
+                                  <img src={s.syllabus_image_url} alt={s.subject_name} className="w-full max-h-64 object-contain rounded-lg" />
+                                  <button 
+                                    onClick={() => setMaximizedPoster({ title: `${s.subject_name} Syllabus Document`, poster_url: s.syllabus_image_url, type: 'Syllabus Document', organizer: s.department })}
+                                    className="absolute bottom-2.5 right-2.5 p-1.5 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer"
+                                    title="Maximize Syllabus Diagram"
+                                  >
+                                    <Maximize2 className="w-3.5 h-3.5 text-blue-400" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       ) : (
                         <div className="text-center text-xs text-slate-400 py-12 bg-slate-950/40 rounded-2xl border border-white/5 space-y-2">
@@ -3652,48 +3659,49 @@ export default function App() {
                           <p className="text-[10px] text-slate-400 mt-0.5">Faculty advisors, assigned subjects & office availability for {user.department} ({user.section || 'Section A'})</p>
                         </div>
                         <span className="text-[9px] bg-amber-500/20 text-amber-300 font-mono font-bold px-2.5 py-1 rounded">
-                          Faculty Directory
+                          Faculty Directory ({staffScheduleList.length})
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {staffScheduleList.filter(f => user.is_admin || (matchesStudentDepartment(f.department, user.department) && matchesStudentSection(f.section, user.section))).length > 0 ? (
-                          staffScheduleList
-                            .filter(f => user.is_admin || (matchesStudentDepartment(f.department, user.department) && matchesStudentSection(f.section, user.section)))
-                            .map((f, idx) => (
-                              <div key={idx} className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-3">
-                                <div className="flex items-center gap-3">
-                                  <img 
-                                    src={f.schedule_image_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"} 
-                                    alt={f.staff_name} 
-                                    className="w-14 h-14 rounded-2xl object-cover border border-white/10 shrink-0" 
-                                  />
-                                  <div>
-                                    <h4 className="font-bold text-white text-sm">{f.staff_name}</h4>
-                                    <p className="text-[10px] text-amber-400 font-mono font-semibold">{f.designation} • <span className="text-cyan-300 font-bold">{f.section || 'Section A'}</span></p>
-                                    <p className="text-[10px] text-slate-400 truncate max-w-[200px]">{f.department}</p>
-                                  </div>
+                        {staffScheduleList.length > 0 ? (
+                          (staffScheduleList.filter(f => user.is_admin || (matchesStudentDepartment(f.department, user.department) && matchesStudentSection(f.section, user.section))).length > 0
+                            ? staffScheduleList.filter(f => user.is_admin || (matchesStudentDepartment(f.department, user.department) && matchesStudentSection(f.section, user.section)))
+                            : staffScheduleList
+                          ).map((f, idx) => (
+                            <div key={idx} className="p-4 bg-slate-950/80 rounded-2xl border border-white/10 space-y-3">
+                              <div className="flex items-center gap-3">
+                                <img 
+                                  src={f.schedule_image_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop"} 
+                                  alt={f.staff_name} 
+                                  className="w-14 h-14 rounded-2xl object-cover border border-white/10 shrink-0" 
+                                />
+                                <div>
+                                  <h4 className="font-bold text-white text-sm">{f.staff_name}</h4>
+                                  <p className="text-[10px] text-amber-400 font-mono font-semibold">{f.designation} • <span className="text-cyan-300 font-bold">{f.section || 'Section A'}</span></p>
+                                  <p className="text-[10px] text-slate-400 truncate max-w-[200px]">{f.department}</p>
                                 </div>
-
-                                <div className="bg-slate-900 p-3 rounded-xl border border-white/5 text-xs font-mono space-y-1.5">
-                                  <p className="text-emerald-400 font-bold">📚 Subject: {f.assigned_subjects || "Core Department Subject"}</p>
-                                  <p className="text-slate-300">⏰ Office Hours: {f.available_hours}</p>
-                                </div>
-
-                                {f.schedule_image_url && (
-                                  <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-1.5">
-                                    <img src={f.schedule_image_url} alt={f.staff_name} className="w-full max-h-48 object-cover rounded-lg" />
-                                    <button 
-                                      onClick={() => setMaximizedPoster({ title: `${f.staff_name} (${f.designation}) Schedule`, poster_url: f.schedule_image_url, type: 'Staff Schedule', organizer: f.department })}
-                                      className="absolute bottom-2.5 right-2.5 p-1.5 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer"
-                                      title="Maximize Staff Schedule Image"
-                                    >
-                                      <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
-                                    </button>
-                                  </div>
-                                )}
                               </div>
-                            ))
+
+                              <div className="bg-slate-900 p-3 rounded-xl border border-white/5 text-xs font-mono space-y-1.5">
+                                <p className="text-emerald-400 font-bold">📚 Subject: {f.assigned_subjects || "Core Department Subject"}</p>
+                                <p className="text-slate-300">⏰ Office Hours: {f.available_hours}</p>
+                              </div>
+
+                              {f.schedule_image_url && (
+                                <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-1.5">
+                                  <img src={f.schedule_image_url} alt={f.staff_name} className="w-full max-h-48 object-cover rounded-lg" />
+                                  <button 
+                                    onClick={() => setMaximizedPoster({ title: `${f.staff_name} (${f.designation}) Schedule`, poster_url: f.schedule_image_url, type: 'Staff Schedule', organizer: f.department })}
+                                    className="absolute bottom-2.5 right-2.5 p-1.5 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer"
+                                    title="Maximize Staff Schedule Image"
+                                  >
+                                    <Maximize2 className="w-3.5 h-3.5 text-amber-400" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ))
                         ) : (
                           <div className="col-span-2 text-center text-xs text-slate-400 py-12 bg-slate-950/40 rounded-2xl border border-white/5 space-y-2">
                             <Users className="w-8 h-8 text-amber-400 mx-auto opacity-50" />
@@ -3717,39 +3725,40 @@ export default function App() {
                           <p className="text-[10px] text-slate-400 mt-0.5">High-resolution schedule charts published by Admin for {user.department} ({user.section || 'Section A'})</p>
                         </div>
                         <span className="text-[9px] bg-cyan-500/20 text-cyan-300 font-mono font-bold px-2.5 py-1 rounded">
-                          Class Schedule
+                          Class Schedule ({masterTimetableList.length})
                         </span>
                       </div>
 
                       <div className="space-y-4">
-                        {masterTimetableList.filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || (matchesStudentDepartment(t.department, user.department) && matchesStudentSection(t.section, user.section)))).length > 0 ? (
-                          masterTimetableList
-                            .filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || (matchesStudentDepartment(t.department, user.department) && matchesStudentSection(t.section, user.section))))
-                            .map((t, idx) => (
-                              <div key={idx} className="p-5 bg-slate-950/80 rounded-2xl border border-white/10 space-y-3">
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <h5 className="font-bold text-white text-sm">{t.subject_name || `${t.department || 'Class'} Timetable`}</h5>
-                                    <p className="text-[10px] text-cyan-400 font-mono font-bold mt-0.5">Section: {t.section || "Section A"} • Year: {t.year || "1st Year"}</p>
-                                  </div>
-                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2.5 py-1 rounded">
-                                    {t.department || user.department}
-                                  </span>
+                        {masterTimetableList.length > 0 ? (
+                          (masterTimetableList.filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || (matchesStudentDepartment(t.department, user.department) && matchesStudentSection(t.section, user.section)))).length > 0
+                            ? masterTimetableList.filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || (matchesStudentDepartment(t.department, user.department) && matchesStudentSection(t.section, user.section))))
+                            : masterTimetableList.filter(t => t.timetable_image_url || t.schedule_image_url)
+                          ).map((t, idx) => (
+                            <div key={idx} className="p-5 bg-slate-950/80 rounded-2xl border border-white/10 space-y-3">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <h5 className="font-bold text-white text-sm">{t.subject_name || `${t.department || 'Class'} Timetable`}</h5>
+                                  <p className="text-[10px] text-cyan-400 font-mono font-bold mt-0.5">Section: {t.section || "Section A"} • Year: {t.year || "1st Year"}</p>
                                 </div>
-
-                                <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
-                                  <img src={t.timetable_image_url || t.schedule_image_url} alt="Class Timetable Chart" className="w-full max-h-96 object-contain rounded-lg" />
-                                  <button 
-                                    onClick={() => setMaximizedPoster({ title: t.subject_name || `${t.department || 'Class'} Timetable`, poster_url: t.timetable_image_url || t.schedule_image_url, type: 'Class Timetable', organizer: t.department })}
-                                    className="absolute bottom-2.5 right-2.5 p-2 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer flex items-center gap-1 text-[10px] font-mono font-bold"
-                                    title="Maximize Class Timetable Chart"
-                                  >
-                                    <Maximize2 className="w-4 h-4 text-cyan-400" />
-                                    <span>Maximize Image</span>
-                                  </button>
-                                </div>
+                                <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2.5 py-1 rounded">
+                                  {t.department || user.department}
+                                </span>
                               </div>
-                            ))
+
+                              <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
+                                <img src={t.timetable_image_url || t.schedule_image_url} alt="Class Timetable Chart" className="w-full max-h-96 object-contain rounded-lg" />
+                                <button 
+                                  onClick={() => setMaximizedPoster({ title: t.subject_name || `${t.department || 'Class'} Timetable`, poster_url: t.timetable_image_url || t.schedule_image_url, type: 'Class Timetable', organizer: t.department })}
+                                  className="absolute bottom-2.5 right-2.5 p-2 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer flex items-center gap-1 text-[10px] font-mono font-bold"
+                                  title="Maximize Class Timetable Chart"
+                                >
+                                  <Maximize2 className="w-4 h-4 text-cyan-400" />
+                                  <span>Maximize Image</span>
+                                </button>
+                              </div>
+                            </div>
+                          ))
                         ) : (
                           <div className="text-center text-xs text-slate-400 py-12 bg-slate-950/40 rounded-2xl border border-white/5 space-y-2">
                             <Clock className="w-8 h-8 text-cyan-400 mx-auto opacity-50" />
