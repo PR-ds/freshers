@@ -818,31 +818,12 @@ app.post('/api/timetable/delete', async (req, res) => {
    STAFF SCHEDULE ENDPOINTS (Faculty Timetable Charts & Availability)
    ========================================================================== */
 
-const defaultStaffScheduleSeed = [
-  {
-    id: "staff-sc-1",
-    staff_name: "Dr. A. K. Sharma",
-    designation: "Senior Professor & HOD",
-    department: "Computer Science Engineering (CSE B.E)",
-    available_hours: "Mon, Wed, Fri: 10:00 AM - 12:30 PM",
-    schedule_image_url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop",
-    assigned_subjects: "Data Structures, Database Architectures"
-  },
-  {
-    id: "staff-sc-2",
-    staff_name: "Prof. Priya Sen",
-    designation: "Associate Professor",
-    department: "Artificial Intelligence & Data Science (AI & DS)",
-    available_hours: "Tue, Thu: 02:00 PM - 04:30 PM",
-    schedule_image_url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop",
-    assigned_subjects: "Machine Learning, Neural Networks"
-  }
-];
+const defaultStaffScheduleSeed = [];
 
 app.get('/api/staff-schedule', async (req, res) => {
   const db = await readDB();
   if (db.staff_schedules === undefined || db.staff_schedules === null) {
-    db.staff_schedules = defaultStaffScheduleSeed;
+    db.staff_schedules = [];
     await writeDB(db);
   }
   res.json({ staff_schedules: db.staff_schedules });
@@ -946,52 +927,14 @@ app.post('/api/timetable/upload', async (req, res) => {
   }
 });
 
-const defaultTimetableSeed = [
-  {
-    id: "tt-cse-1",
-    department: "Computer Science Engineering (CSE B.E)",
-    year: "1st Year",
-    subject_name: "Odd Semester Official Class Timetable Chart",
-    timetable_image_url: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&auto=format&fit=crop",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "tt-aids-1",
-    department: "Artificial Intelligence and Data Science (AI&DS B.Tech)",
-    year: "1st Year",
-    subject_name: "AI & DS Semester 1 Schedule Diagram",
-    timetable_image_url: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop",
-    created_at: new Date().toISOString()
-  }
-];
+const defaultTimetableSeed = [];
 
-const defaultStaffSchedulesSeed = [
-  {
-    id: "staff-1",
-    staff_name: "Dr. A. K. Sharma",
-    designation: "Senior Professor & HOD",
-    department: "Computer Science Engineering (CSE B.E)",
-    assigned_subjects: "Core Dept Subjects & Algorithms",
-    available_hours: "Mon, Wed, Fri: 10:00 AM - 12:30 PM",
-    schedule_image_url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "staff-2",
-    staff_name: "Dr. Meera Raman",
-    designation: "Associate Professor & AI Lead",
-    department: "Artificial Intelligence and Data Science (AI&DS B.Tech)",
-    assigned_subjects: "Neural Networks & Deep Learning Labs",
-    available_hours: "Tue, Thu: 02:00 PM - 04:30 PM",
-    schedule_image_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop",
-    created_at: new Date().toISOString()
-  }
-];
+const defaultStaffSchedulesSeed = [];
 
 app.get('/api/timetable/all', async (req, res) => {
   const db = await readDB();
   if (db.timetable === undefined || db.timetable === null) {
-    db.timetable = defaultTimetableSeed;
+    db.timetable = [];
     await writeDB(db);
   }
   res.json({ timetable: db.timetable });
@@ -1114,83 +1057,14 @@ app.post('/api/staff_schedules/delete', async (req, res) => {
    SUBJECTS & SYLLABUS ENDPOINTS (Years 1 to 4 & All Departments)
    ========================================================================== */
 
-const defaultSyllabusSeed = [
-  {
-    id: "syl-cse-1",
-    department: "Computer Science Engineering (CSE B.E)",
-    year: "1st Year",
-    subject_code: "CS101",
-    subject_name: "Problem Solving & Data Structures",
-    credits: 4,
-    category: "Core Engineering",
-    units: [
-      "Unit 1: Computational Logic, Flowcharts & C Fundamentals",
-      "Unit 2: Dynamic Memory Allocation, Pointers & Array Math",
-      "Unit 3: Stack, Queue Implementations & Linked List Operations",
-      "Unit 4: Binary Trees, BST Traversals & Heaps",
-      "Unit 5: Graph Theory, Dijkstra Algorithm & Hashing Techniques"
-    ],
-    reference_links: ["https://mitopencourseware.com", "https://freecodecamp.org"]
-  },
-  {
-    id: "syl-cse-2",
-    department: "Computer Science Engineering (CSE B.E)",
-    year: "2nd Year",
-    subject_code: "CS201",
-    subject_name: "Database Management Systems (DBMS)",
-    credits: 4,
-    category: "Core Engineering",
-    units: [
-      "Unit 1: Relational Algebra & ER Modeling",
-      "Unit 2: SQL DDL, DML, Joins & Subqueries",
-      "Unit 3: Normalization (1NF to BCNF) & Functional Dependencies",
-      "Unit 4: Transaction Processing, ACID Properties & Concurrency Control",
-      "Unit 5: B-Trees, Indexing & NoSQL Architectures"
-    ],
-    reference_links: ["https://w3schools.com/sql", "https://youtube.com"]
-  },
-  {
-    id: "syl-aids-1",
-    department: "Artificial Intelligence & Data Science (AI & DS)",
-    year: "1st Year",
-    subject_code: "AD101",
-    subject_name: "Foundations of Artificial Intelligence",
-    credits: 4,
-    category: "Core AI",
-    units: [
-      "Unit 1: Intelligent Agents & Problem Spaces",
-      "Unit 2: Heuristic Search Strategies (A*, Minimax, Alpha-Beta)",
-      "Unit 3: Knowledge Representation & First-Order Logic",
-      "Unit 4: Probabilistic Reasoning & Bayesian Networks",
-      "Unit 5: Introduction to Neural Networks & Reinforcement Learning"
-    ],
-    reference_links: ["https://ai.stanford.edu", "https://deeplearning.ai"]
-  },
-  {
-    id: "syl-ece-1",
-    department: "Electronics & Communication (ECE)",
-    year: "1st Year",
-    subject_code: "EC101",
-    subject_name: "Digital Electronics & Signals",
-    credits: 4,
-    category: "Core Circuits",
-    units: [
-      "Unit 1: Boolean Algebra & Logic Gate Networks",
-      "Unit 2: Combinational Logic (Multiplexers, Decoders, Adders)",
-      "Unit 3: Sequential Logic (Flip-Flops, Counters, Shift Registers)",
-      "Unit 4: Continuous vs Discrete Signals & Fourier Transforms",
-      "Unit 5: Microcontroller Architecture (8051 & STM32 Basics)"
-    ],
-    reference_links: ["https://nptel.ac.in"]
-  }
-];
+const defaultSyllabusSeed = [];
 
 app.get('/api/syllabus', async (req, res) => {
   const { department, year } = req.query;
   const db = await readDB();
   
   if (db.syllabus === undefined || db.syllabus === null) {
-    db.syllabus = defaultSyllabusSeed;
+    db.syllabus = [];
     await writeDB(db);
   }
 
@@ -1361,44 +1235,7 @@ app.get('/api/events', async (req, res) => {
   const now = new Date();
   
   if (db.events === undefined || db.events === null) {
-    db.events = [
-      {
-        id: "ev-1",
-        type: "Hackathon",
-        title: "Prism Hack 2026: 3D Frontend Challenge",
-        description: "Design fluid interactive 3D WebGL interfaces using Three.js and custom shaders. Organized by the CSE Coding Society.",
-        organizer: "CSE Dept",
-        date_string: "Ongoing (Ends in 4 hrs)",
-        is_ongoing: true,
-        deadline: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-        poster_url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop",
-        registration_link: ""
-      },
-      {
-        id: "ev-2",
-        type: "Symposium",
-        title: "Robotics & IoT Showcase",
-        description: "Live demonstration of autonomous hardware models and STM32 sensor relays. Organized by ECE Dept.",
-        organizer: "ECE Dept",
-        date_string: "Ongoing (Live Session)",
-        is_ongoing: true,
-        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-        poster_url: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop",
-        registration_link: ""
-      },
-      {
-        id: "ev-3",
-        type: "Workshop",
-        title: "Web3 Smart Contracts & Auditing",
-        description: "Learn Solidity compile patterns and test smart contract vulnerabilities. Organized by CSBS Dept.",
-        organizer: "CSBS Dept",
-        date_string: "August 2026",
-        is_ongoing: false,
-        deadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
-        poster_url: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&auto=format&fit=crop",
-        registration_link: "https://ethereum.org"
-      }
-    ];
+    db.events = [];
     await writeDB(db);
   } else {
     // AUTOMATIC DEADLINE EXPIRY CLEANER: Delete events whose registration deadline is reached
