@@ -841,7 +841,7 @@ const defaultStaffScheduleSeed = [
 
 app.get('/api/staff-schedule', async (req, res) => {
   const db = await readDB();
-  if (!db.staff_schedules || db.staff_schedules.length === 0) {
+  if (db.staff_schedules === undefined || db.staff_schedules === null) {
     db.staff_schedules = defaultStaffScheduleSeed;
     await writeDB(db);
   }
@@ -990,7 +990,7 @@ const defaultStaffSchedulesSeed = [
 
 app.get('/api/timetable/all', async (req, res) => {
   const db = await readDB();
-  if (!db.timetable || db.timetable.length === 0) {
+  if (db.timetable === undefined || db.timetable === null) {
     db.timetable = defaultTimetableSeed;
     await writeDB(db);
   }
@@ -1039,7 +1039,7 @@ app.post('/api/timetable/manage', async (req, res) => {
 
 app.post('/api/timetable/delete', async (req, res) => {
   const { id } = req.body;
-  if (!id) return res.status(400).json({ error: "Slot id is required." });
+  if (!id) return res.status(400).json({ error: "Timetable slot id is required." });
 
   const db = await readDB();
   if (!db.timetable) db.timetable = [];
@@ -1050,7 +1050,7 @@ app.post('/api/timetable/delete', async (req, res) => {
 
 app.get('/api/staff_schedules', async (req, res) => {
   const db = await readDB();
-  if (!db.staff_schedules || db.staff_schedules.length === 0) {
+  if (db.staff_schedules === undefined || db.staff_schedules === null) {
     db.staff_schedules = defaultStaffSchedulesSeed;
     await writeDB(db);
   }
@@ -1189,7 +1189,7 @@ app.get('/api/syllabus', async (req, res) => {
   const { department, year } = req.query;
   const db = await readDB();
   
-  if (!db.syllabus || db.syllabus.length === 0) {
+  if (db.syllabus === undefined || db.syllabus === null) {
     db.syllabus = defaultSyllabusSeed;
     await writeDB(db);
   }
@@ -1360,7 +1360,7 @@ app.get('/api/events', async (req, res) => {
   const db = await readDB();
   const now = new Date();
   
-  if (!db.events || db.events.length === 0) {
+  if (db.events === undefined || db.events === null) {
     db.events = [
       {
         id: "ev-1",
