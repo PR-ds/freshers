@@ -3515,7 +3515,7 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Division Selector Buttons (3 Divisions: Syllabus, Staff, Class Time Table) */}
+                    {/* Division Selector Buttons (Syllabus & Time Table, Staff Schedules) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <button 
                         type="button"
@@ -3523,7 +3523,7 @@ export default function App() {
                         className={`py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'syllabus' ? 'bg-blue-600 text-white shadow-lg neon-glow-blue border border-blue-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
                       >
                         <BookOpenCheck className="w-4 h-4 text-blue-300" />
-                        <span>1. Syllabus</span>
+                        <span>1. Syllabus & Time Table</span>
                       </button>
 
                       <button 
@@ -3532,7 +3532,7 @@ export default function App() {
                         className={`py-3 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${academicsSubTab === 'staffs' ? 'bg-amber-600 text-white shadow-lg neon-glow-orange border border-amber-400/40' : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'}`}
                       >
                         <Users className="w-4 h-4 text-amber-300" />
-                        <span>2. Staff</span>
+                        <span>2. Faculty Staff Schedules</span>
                       </button>
 
                       <button 
@@ -3546,82 +3546,140 @@ export default function App() {
                     </div>
                   </TiltCard3D>
 
-                  {/* DIVISION 1: SYLLABUS */}
+                  {/* COMBINED DIVISION: SYLLABUS & CLASS TIME TABLE ON SAME PAGE */}
                   {academicsSubTab === 'syllabus' && (
-                    <TiltCard3D className="p-6 space-y-6">
-                      <div className="pb-4 border-b border-white/5 flex flex-wrap justify-between items-center gap-3">
-                        <div>
-                          <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                            <BookOpenCheck className="w-4 h-4 text-blue-400" />
-                            Official Course Syllabus & Unit Breakdowns
-                          </h4>
-                          <p className="text-[10px] text-slate-400 mt-0.5">Strictly displaying official syllabus uploaded by Admin for {user.department}</p>
+                    <div className="space-y-6">
+                      {/* SECTION A: CLASS TIME TABLE */}
+                      <TiltCard3D className="p-6 space-y-6">
+                        <div className="pb-4 border-b border-white/5 flex flex-wrap justify-between items-center gap-3">
+                          <div>
+                            <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                              <Clock className="w-4 h-4 text-cyan-400" />
+                              Official Class Timetables
+                            </h4>
+                            <p className="text-[10px] text-slate-400 mt-0.5">High-resolution schedule charts published by Admin for {user.department} ({user.section || 'Section A'})</p>
+                          </div>
+                          <span className="text-[9px] bg-cyan-500/20 text-cyan-300 font-mono font-bold px-2.5 py-1 rounded">
+                            Class Schedule ({masterTimetableList.length})
+                          </span>
                         </div>
-                        <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2.5 py-1 rounded font-mono">
-                          Admin Synced Syllabus ({masterSyllabusList.length})
-                        </span>
-                      </div>
 
-                      {/* Display Published Syllabus */}
-                      {masterSyllabusList.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {(masterSyllabusList.filter(s => user.is_admin || matchesStudentDepartment(s.department, user.department)).length > 0 
-                            ? masterSyllabusList.filter(s => user.is_admin || matchesStudentDepartment(s.department, user.department))
-                            : masterSyllabusList
-                          ).map((s, idx) => (
-                            <div key={idx} className="p-5 bg-slate-950/80 rounded-2xl border border-white/10 space-y-4">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">
-                                    {s.subject_code || "CS101"}
+                        <div className="space-y-4">
+                          {masterTimetableList.length > 0 ? (
+                            (masterTimetableList.filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || (matchesStudentDepartment(t.department, user.department) && matchesStudentSection(t.section, user.section)))).length > 0
+                              ? masterTimetableList.filter(t => (t.timetable_image_url || t.schedule_image_url) && (user.is_admin || (matchesStudentDepartment(t.department, user.department) && matchesStudentSection(t.section, user.section))))
+                              : masterTimetableList.filter(t => t.timetable_image_url || t.schedule_image_url)
+                            ).map((t, idx) => (
+                              <div key={idx} className="p-5 bg-slate-950/80 rounded-2xl border border-white/10 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <h5 className="font-bold text-white text-sm">{t.subject_name || `${t.department || 'Class'} Timetable`}</h5>
+                                    <p className="text-[10px] text-cyan-400 font-mono font-bold mt-0.5">Section: {t.section || "Section A"} • Year: {t.year || "1st Year"}</p>
+                                  </div>
+                                  <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2.5 py-1 rounded">
+                                    {t.department || user.department}
                                   </span>
-                                  <h5 className="font-bold text-white text-sm mt-1">{s.subject_name}</h5>
                                 </div>
-                                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono font-bold px-2 py-0.5 rounded">
-                                  {s.credits || 4} Credits
-                                </span>
-                              </div>
 
-                              <p className="text-[10px] text-slate-400 font-mono">Dept: {s.department} • Year: {s.year || "1st Year"}</p>
-
-                              {/* Units List */}
-                              {Array.isArray(s.units) && s.units.length > 0 && (
-                                <div className="space-y-1.5 pt-2 border-t border-white/5">
-                                  <span className="text-[10px] font-bold text-cyan-400 uppercase font-mono">Curriculum Units:</span>
-                                  {s.units.map((unit, uIdx) => (
-                                    <div key={uIdx} className="p-2 bg-white/5 rounded-xl border border-white/5 text-xs text-slate-300 flex items-center gap-2">
-                                      <span className="text-cyan-400 font-mono font-bold text-[10px]">•</span>
-                                      <span>{unit}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-
-                              {/* Syllabus Document Image */}
-                              {s.syllabus_image_url && (
-                                <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2 mt-3">
-                                  <span className="text-[9px] text-cyan-300 font-mono font-bold block mb-1">Official Syllabus Document / Diagram:</span>
-                                  <img src={s.syllabus_image_url} alt={s.subject_name} className="w-full max-h-64 object-contain rounded-lg" />
+                                <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2">
+                                  <img src={t.timetable_image_url || t.schedule_image_url} alt="Class Timetable Chart" className="w-full max-h-96 object-contain rounded-lg" />
                                   <button 
-                                    onClick={() => setMaximizedPoster({ title: `${s.subject_name} Syllabus Document`, poster_url: s.syllabus_image_url, type: 'Syllabus Document', organizer: s.department })}
-                                    className="absolute bottom-2.5 right-2.5 p-1.5 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer"
-                                    title="Maximize Syllabus Diagram"
+                                    onClick={() => setMaximizedPoster({ title: t.subject_name || `${t.department || 'Class'} Timetable`, poster_url: t.timetable_image_url || t.schedule_image_url, type: 'Class Timetable', organizer: t.department })}
+                                    className="absolute bottom-2.5 right-2.5 p-2 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer flex items-center gap-1 text-[10px] font-mono font-bold"
+                                    title="Maximize Class Timetable Chart"
                                   >
-                                    <Maximize2 className="w-3.5 h-3.5 text-blue-400" />
+                                    <Maximize2 className="w-4 h-4 text-cyan-400" />
+                                    <span>Maximize Image</span>
                                   </button>
                                 </div>
-                              )}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center text-xs text-slate-400 py-10 bg-slate-950/40 rounded-2xl border border-white/5 space-y-2">
+                              <Clock className="w-8 h-8 text-cyan-400 mx-auto opacity-50" />
+                              <p className="font-bold text-slate-300">No timetable chart uploaded for {user.department} ({user.section || 'Section A'})</p>
+                              <p className="text-[10px] text-slate-500">When Admin uploads class timetable charts in Admin Hub, they will display live right here!</p>
                             </div>
-                          ))}
+                          )}
                         </div>
-                      ) : (
-                        <div className="text-center text-xs text-slate-400 py-12 bg-slate-950/40 rounded-2xl border border-white/5 space-y-2">
-                          <BookOpenCheck className="w-8 h-8 text-blue-400 mx-auto opacity-50" />
-                          <p className="font-bold text-slate-300">No custom syllabus uploaded yet for {user.department}</p>
-                          <p className="text-[10px] text-slate-500">When Admin posts new syllabus documents in Admin Hub, they will display live right here!</p>
+                      </TiltCard3D>
+
+                      {/* SECTION B: SYLLABUS & UNIT BREAKDOWNS */}
+                      <TiltCard3D className="p-6 space-y-6">
+                        <div className="pb-4 border-b border-white/5 flex flex-wrap justify-between items-center gap-3">
+                          <div>
+                            <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                              <BookOpenCheck className="w-4 h-4 text-blue-400" />
+                              Official Course Syllabus & Unit Breakdowns
+                            </h4>
+                            <p className="text-[10px] text-slate-400 mt-0.5">Strictly displaying official syllabus uploaded by Admin for {user.department}</p>
+                          </div>
+                          <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2.5 py-1 rounded font-mono">
+                            Admin Synced Syllabus ({masterSyllabusList.length})
+                          </span>
                         </div>
-                      )}
-                    </TiltCard3D>
+
+                        {/* Display Published Syllabus */}
+                        {masterSyllabusList.length > 0 ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {(masterSyllabusList.filter(s => user.is_admin || matchesStudentDepartment(s.department, user.department)).length > 0 
+                              ? masterSyllabusList.filter(s => user.is_admin || matchesStudentDepartment(s.department, user.department))
+                              : masterSyllabusList
+                            ).map((s, idx) => (
+                              <div key={idx} className="p-5 bg-slate-950/80 rounded-2xl border border-white/10 space-y-4">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <span className="text-[9px] bg-blue-500/20 text-blue-300 font-mono font-bold px-2 py-0.5 rounded">
+                                      {s.subject_code || "CS101"}
+                                    </span>
+                                    <h5 className="font-bold text-white text-sm mt-1">{s.subject_name}</h5>
+                                  </div>
+                                  <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono font-bold px-2 py-0.5 rounded">
+                                    {s.credits || 4} Credits
+                                  </span>
+                                </div>
+
+                                <p className="text-[10px] text-slate-400 font-mono">Dept: {s.department} • Year: {s.year || "1st Year"}</p>
+
+                                {/* Units List */}
+                                {Array.isArray(s.units) && s.units.length > 0 && (
+                                  <div className="space-y-1.5 pt-2 border-t border-white/5">
+                                    <span className="text-[10px] font-bold text-cyan-400 uppercase font-mono">Curriculum Units:</span>
+                                    {s.units.map((unit, uIdx) => (
+                                      <div key={uIdx} className="p-2 bg-white/5 rounded-xl border border-white/5 text-xs text-slate-300 flex items-center gap-2">
+                                        <span className="text-cyan-400 font-mono font-bold text-[10px]">•</span>
+                                        <span>{unit}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Syllabus Document Image */}
+                                {s.syllabus_image_url && (
+                                  <div className="relative group rounded-xl overflow-hidden border border-white/10 bg-slate-900 p-2 mt-3">
+                                    <span className="text-[9px] text-cyan-300 font-mono font-bold block mb-1">Official Syllabus Document / Diagram:</span>
+                                    <img src={s.syllabus_image_url} alt={s.subject_name} className="w-full max-h-64 object-contain rounded-lg" />
+                                    <button 
+                                      onClick={() => setMaximizedPoster({ title: `${s.subject_name} Syllabus Document`, poster_url: s.syllabus_image_url, type: 'Syllabus Document', organizer: s.department })}
+                                      className="absolute bottom-2.5 right-2.5 p-1.5 bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white rounded-lg backdrop-blur-md shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer"
+                                      title="Maximize Syllabus Diagram"
+                                    >
+                                      <Maximize2 className="w-3.5 h-3.5 text-blue-400" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center text-xs text-slate-400 py-10 bg-slate-950/40 rounded-2xl border border-white/5 space-y-2">
+                            <BookOpenCheck className="w-8 h-8 text-blue-400 mx-auto opacity-50" />
+                            <p className="font-bold text-slate-300">No custom syllabus uploaded yet for {user.department}</p>
+                            <p className="text-[10px] text-slate-500">When Admin posts new syllabus documents in Admin Hub, they will display live right here!</p>
+                          </div>
+                        )}
+                      </TiltCard3D>
+                    </div>
                   )}
 
                   {/* DIVISION 3: STAFFS */}
