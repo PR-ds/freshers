@@ -225,11 +225,6 @@ const callGemini = async (prompt, systemInstruction = '', responseSchema = null)
 
   return fallbackMockGemini(prompt, systemInstruction);
 };
-  } catch (error) {
-    console.error("❌ Gemini Call Failed:", error);
-    return fallbackMockGemini(prompt, systemInstruction);
-  }
-};
 
 // Fallback logic in case Gemini key is missing or fails
 const fallbackMockGemini = (prompt, systemInstruction) => {
@@ -342,7 +337,7 @@ app.post('/api/auth/sso/login', async (req, res) => {
       full_name: resolvedStudentName,
       batch_no: batchCode,
       department: deptName,
-      roll_no: '2026' + deptName.substring(0,3).toUpperCase() + Math.floor(100 + Math.random() * 900),
+      roll_no: '2026' + deptName.substring(0, 3).toUpperCase() + Math.floor(100 + Math.random() * 900),
       onboarding_completed: true,
       academic_interests: ["Coding Society", "Web Development"],
       domain_track: 'Software Engineering',
@@ -385,7 +380,7 @@ app.post('/api/auth/sso/login', async (req, res) => {
     };
     db.admin_login_logs.unshift(adminLogEntry);
     await logIncident(db, 'ADMIN_LOGIN', `Admin Session Initiated by ${user.full_name}`, `System administrator logged in successfully. IP: ${req.ip || '127.0.0.1'}`, user.full_name);
-    
+
     if (supabaseClient) {
       supabaseClient.from('admin_login_logs').insert([adminLogEntry]).then().catch(err => console.warn("Supabase admin log sync:", err.message));
     }
@@ -403,7 +398,7 @@ app.post('/api/auth/sso/login', async (req, res) => {
     };
     db.student_login_logs.unshift(loginLogEntry);
     await logIncident(db, 'STUDENT_LOGIN', `Student Login: ${user.full_name}`, `Student ${user.full_name} (${user.department}) authenticated.`, user.full_name);
-    
+
     if (supabaseClient) {
       supabaseClient.from('student_login_logs').insert([loginLogEntry]).then().catch(err => console.warn("Supabase student log sync:", err.message));
     }
@@ -636,7 +631,7 @@ app.post('/api/onboarding/chat', async (req, res) => {
   } else if (turn >= 3) {
     // Process final turn and trigger Gemini optimized profile builder
     const userAnswers = userChats.filter(c => c.role === 'user').map(c => c.message_content).join('\n');
-    
+
     const onboardingInstruction = `
     You are the College Fresher Onboarding Architect.
     Your task is to analyze the student's answers and output their profiles.
@@ -915,7 +910,7 @@ app.post('/api/staff-schedule/delete', async (req, res) => {
 
 app.post('/api/timetable/upload', async (req, res) => {
   const { csv_data, batch_no, department, year } = req.body;
-  
+
   if (!csv_data || !batch_no) {
     return res.status(400).json({ error: "Timetable CSV data and batch number are required." });
   }
@@ -927,7 +922,7 @@ app.post('/api/timetable/upload', async (req, res) => {
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
-      
+
       const [day, subject, start, end, room, bld, fac] = line.split(',');
       parsedRecords.push({
         id: "tt-" + Math.random().toString(36).substr(2, 9),
@@ -1090,7 +1085,7 @@ const defaultSyllabusSeed = [];
 app.get('/api/syllabus', async (req, res) => {
   const { department, year } = req.query;
   const db = await readDB();
-  
+
   if (db.syllabus === undefined || db.syllabus === null) {
     db.syllabus = [];
     await writeDB(db);
@@ -1199,10 +1194,10 @@ app.post('/api/syllabus/delete', async (req, res) => {
 app.get('/api/todo', async (req, res) => {
   const { user_id } = req.query;
   if (!user_id) return res.status(400).json({ error: "user_id parameter is required." });
-  
+
   const db = await readDB();
   if (!db.todos) db.todos = [];
-  
+
   const userTodos = db.todos.filter(t => t.user_id === user_id);
   res.json({ todos: userTodos });
 });
@@ -1261,7 +1256,7 @@ app.post('/api/todo/delete', async (req, res) => {
 app.get('/api/events', async (req, res) => {
   const db = await readDB();
   const now = new Date();
-  
+
   if (db.events === undefined || db.events === null) {
     db.events = [];
     await writeDB(db);
@@ -1294,8 +1289,8 @@ app.post('/api/events', async (req, res) => {
   if (!db.events) db.events = [];
 
   // Default registration deadline to 7 days from now if not provided
-  const resolvedDeadline = deadline && !isNaN(new Date(deadline).getTime()) 
-    ? new Date(deadline).toISOString() 
+  const resolvedDeadline = deadline && !isNaN(new Date(deadline).getTime())
+    ? new Date(deadline).toISOString()
     : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
   const newEvent = {
@@ -1341,7 +1336,7 @@ app.post('/api/events', async (req, res) => {
   const emailBody = `Dear Principal & Department HODs,\n\nA new campus event announcement and poster has been published by ${organizer}.\n\nEvent Title: ${title}\nEvent Type: ${type}\nDate: ${date_string}\nOrganizer: ${organizer}\nPoster URL: ${newEvent.poster_url}\n\nDescription:\n${description}\n\nThis event poster has been automatically published to all student portal views across all departments.`;
 
   broadcastRecipients.forEach(email => {
-    sendEmailNotification(email, emailSubject, emailBody).catch(err => 
+    sendEmailNotification(email, emailSubject, emailBody).catch(err =>
       console.error(`Broadcast failed for ${email}:`, err)
     );
   });
