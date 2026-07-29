@@ -170,7 +170,7 @@ const writeDB = async (data) => {
   }
 };
 
-// Gemini API Wrapper
+// Gemini API Wrapper with Multi-Model Fallback
 const callGemini = async (prompt, systemInstruction = '', responseSchema = null) => {
   const apiKey = process.env.GEMINI_API_KEY || '';
   if (!apiKey) {
@@ -178,46 +178,53 @@ const callGemini = async (prompt, systemInstruction = '', responseSchema = null)
     return fallbackMockGemini(prompt, systemInstruction);
   }
 
-  try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-    
-    const requestBody = {
-      contents: [{ parts: [{ text: prompt }] }],
-    };
+  const modelsToTry = [
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+    'gemini-2.5-flash'
+  ];
 
-    if (systemInstruction) {
-      requestBody.systemInstruction = {
-        parts: [{ text: systemInstruction }]
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const requestBody = {
+        contents: [{ parts: [{ text: prompt }] }],
       };
-    }
 
-    if (responseSchema) {
-      requestBody.generationConfig = {
-        responseMimeType: "application/json",
-        responseSchema: responseSchema
-      };
-    }
+      if (systemInstruction) {
+        requestBody.systemInstruction = {
+          parts: [{ text: systemInstruction }]
+        };
+      }
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    });
+      if (responseSchema) {
+        requestBody.generationConfig = {
+          responseMimeType: "application/json",
+          responseSchema: responseSchema
+        };
+      }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gemini API Error (${response.status}): ${errorText}`);
-    }
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
 
-    const result = await response.json();
-    const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (responseSchema) {
-      return JSON.parse(responseText);
+      if (response.ok) {
+        const result = await response.json();
+        const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (responseSchema) {
+          return JSON.parse(responseText);
+        }
+        return responseText;
+      }
+    } catch (err) {
+      console.warn(`Model ${model} try note:`, err.message);
     }
-    return responseText;
+  }
+
+  return fallbackMockGemini(prompt, systemInstruction);
+};
   } catch (error) {
     console.error("❌ Gemini Call Failed:", error);
     return fallbackMockGemini(prompt, systemInstruction);
