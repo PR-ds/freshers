@@ -1327,16 +1327,39 @@ app.post('/api/events', async (req, res) => {
   res.json({ success: true, event: newEvent });
 });
 
-app.post('/api/events/delete', async (req, res) => {
-  const { id } = req.body;
+const deleteEventPermanently = async (req, res) => {
+  const id = req.body?.id || req.params?.id || req.query?.id;
   if (!id) return res.status(400).json({ error: "Event id is required." });
 
   const db = await readDB();
   if (!db.events) db.events = [];
-  db.events = db.events.filter(e => e.id !== id);
+  const targetEvent = db.events.find(e => e.id === id || e.id == id);
+  db.events = db.events.filter(e => e.id !== id && e.id != id);
+
+  // Permanently purge associated registrations & broadcast notifications
+  if (db.registrations) {
+    db.registrations = db.registrations.filter(r => r.event_id !== id && r.event_id != id);
+  }
+  if (db.notifications && targetEvent) {
+    db.notifications = db.notifications.filter(n => !n.title.includes(targetEvent.title));
+  }
+
+  if (supabaseClient) {
+    try {
+      await supabaseClient.from('events').delete().eq('id', id);
+    } catch (err) {
+      console.warn("Supabase direct event table deletion note:", err.message);
+    }
+  }
+
   await writeDB(db);
-  res.json({ success: true });
-});
+  console.log(`🗑️ [PERMANENT DELETION] Event '${id}' and all associated details permanently erased from database.`);
+  res.json({ success: true, message: `Event ${id} permanently deleted from database.` });
+};
+
+app.post('/api/events/delete', deleteEventPermanently);
+app.delete('/api/events/delete', deleteEventPermanently);
+app.delete('/api/events/:id', deleteEventPermanently);
 
 app.post('/api/events/register', async (req, res) => {
   const { event_id, team_name, members } = req.body;

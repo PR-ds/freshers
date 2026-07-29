@@ -135,5 +135,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Student Portal Backend running on http://localhost:${PORT}`);
+  console.log('🚀 Student Portal Backend running on https://freshers-portal-9zxf.onrender.com');
 });
