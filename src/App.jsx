@@ -999,11 +999,7 @@ export default function App() {
 
   const [todos, setTodos] = useState([]);
   const [newTodoText, setNewTodoText] = useState('');
-  const [eventsList, setEventsList] = useState(() => {
-    const cached = safeStorage.getItem('cached_events');
-    if (cached) { try { return JSON.parse(cached); } catch (e) {} }
-    return [];
-  });
+  const [eventsList, setEventsList] = useState([]);
   const [timetableList, setTimetableList] = useState([]);
 
   // Event Registration Modal states
@@ -1470,25 +1466,25 @@ export default function App() {
   }, [user]);
 
   useEffect(() => {
-    if (eventsList && eventsList.length > 0) {
+    if (Array.isArray(eventsList)) {
       safeStorage.setItem('cached_events', JSON.stringify(eventsList));
     }
   }, [eventsList]);
 
   useEffect(() => {
-    if (masterTimetableList && masterTimetableList.length > 0) {
+    if (Array.isArray(masterTimetableList)) {
       safeStorage.setItem('cached_timetable', JSON.stringify(masterTimetableList));
     }
   }, [masterTimetableList]);
 
   useEffect(() => {
-    if (studentSyllabusList && studentSyllabusList.length > 0) {
+    if (Array.isArray(studentSyllabusList)) {
       safeStorage.setItem('cached_syllabus', JSON.stringify(studentSyllabusList));
     }
   }, [studentSyllabusList]);
 
   useEffect(() => {
-    if (staffScheduleList && staffScheduleList.length > 0) {
+    if (Array.isArray(staffScheduleList)) {
       safeStorage.setItem('cached_staff', JSON.stringify(staffScheduleList));
     }
   }, [staffScheduleList]);

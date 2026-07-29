@@ -106,8 +106,12 @@ if (!fs.existsSync(DB_FILE)) {
 const supabaseBucketName = process.env.SUPABASE_BUCKET_NAME || 'freshman-portal-storage';
 const supabaseFileName = 'db.json';
 
+let inMemoryDB = null;
+
 // Asynchronous Supabase Cloud Storage & DB read/write helpers
 const readDB = async () => {
+  if (inMemoryDB) return inMemoryDB;
+
   let dbData;
   if (supabaseClient) {
     try {
@@ -141,10 +145,12 @@ const readDB = async () => {
   if (!dbData.notifications) dbData.notifications = [];
   if (!dbData.student_progress) dbData.student_progress = {};
 
+  inMemoryDB = dbData;
   return dbData;
 };
 
 const writeDB = async (data) => {
+  inMemoryDB = data;
   const content = JSON.stringify(data, null, 2);
   fs.writeFileSync(DB_FILE, content);
 
