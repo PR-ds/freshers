@@ -685,41 +685,46 @@ app.post('/api/onboarding/chat', async (req, res) => {
    ========================================================================== */
 
 app.post('/api/mentor/chat', async (req, res) => {
-  const { user_id, message } = req.body;
+  const { user_id, message, domain_track, learning_style } = req.body;
   const db = await readDB();
-  const user = db.users.find(u => u.id === user_id);
+  let user = db.users.find(u => u.id === user_id || u.email === user_id);
 
-  if (!user) {
-    return res.status(404).json({ error: "User not found." });
+  const fallbackUser = user || {
+    id: user_id || "guest",
+    domain_track: domain_track || "Full-Stack Web Development",
+    learning_style: learning_style || "Hands-on Projects"
+  };
+
+  const chatKey = user_id || "guest";
+  if (!db.mentor_chats) db.mentor_chats = {};
+  if (!db.mentor_chats[chatKey]) {
+    db.mentor_chats[chatKey] = [];
   }
 
-  if (!db.mentor_chats[user_id]) {
-    db.mentor_chats[user_id] = [];
-  }
+  const mentorHistory = db.mentor_chats[chatKey];
+  mentorHistory.push({ role: 'user', message_content: message || "Hello AI Mentor", timestamp: new Date().toISOString() });
 
-  const mentorHistory = db.mentor_chats[user_id];
-  mentorHistory.push({ role: 'user', message_content: message });
-
-  // Get recent 6 turns to feed into Gemini prompt
   const recentHistory = mentorHistory.slice(-6);
   const formattedHistory = recentHistory.map(m => `${m.role === 'user' ? 'Student' : 'Mentor'}: ${m.message_content}`).join('\n');
 
   const systemInstruction = `
-  You are an expert college growth mentor helper. 
+  You are an expert college growth AI mentor and career advisor for freshmen students.
   Student Profile:
-  - Domain: ${user.domain_track}
-  - Learning Style: ${user.learning_style}
-  
-  Rule: Answer in maximum 3 sentences. Be extremely actionable, encouraging, and direct.
+  - Track: ${fallbackUser.domain_track}
+  - Learning Style: ${fallbackUser.learning_style}
+
+  Rule: Provide actionable, motivating, professional advice in 2 to 4 sentences. Be warm and encouraging.
   `;
 
   try {
     const replyText = await callGemini(formattedHistory, systemInstruction);
-    mentorHistory.push({ role: 'model', message_content: replyText });
+    const finalReply = replyText || "I'm your AI College Counselor! Ask me anything about subject roadmaps, career skills, or balancing academics.";
+    mentorHistory.push({ role: 'model', message_content: finalReply, timestamp: new Date().toISOString() });
     await writeDB(db);
-    res.json({ reply: replyText });
+    res.json({ reply: finalReply, history: mentorHistory });
   } catch (error) {
-    res.status(500).json({ error: "Mentor connection error." });
+    console.error("Mentor Chat Error:", error);
+    res.json({ reply: "I'm here to support your college journey! Keep building skills step-by-step." });
   }
 });
 
@@ -728,6 +733,16 @@ app.post('/api/mentor/chat', async (req, res) => {
    ========================================================================== */
 
 app.get('/api/timetable/all', async (req, res) => {
+  const db = await readDB();
+  res.json({ timetable: db.timetable || [] });
+});
+
+app.get('/api/timetable/:id', async (req, res) => {
+  const db = await readDB();
+  res.json({ timetable: db.timetable || [] });
+});
+
+app.get('/api/timetable', async (req, res) => {
   const db = await readDB();
   res.json({ timetable: db.timetable || [] });
 });

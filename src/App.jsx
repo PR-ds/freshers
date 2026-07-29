@@ -2707,7 +2707,7 @@ export default function App() {
       return;
     }
 
-    // Query backend Gemini Chatbot API or fallback
+    // Query backend Gemini Chatbot API with permanent Supabase DB persistence
     try {
       const res = await fetch(`${API_BASE}/chatbot`, {
         method: 'POST',
@@ -2735,7 +2735,7 @@ export default function App() {
       const simulatedReplies = [
         "💡 Tip: For this, start by identifying the scope. Declaring parameters cleanly makes recursive calls stable.",
         "💡 Concept: To design this database logic, ensure matching keys are indexed. It prevents page load delays.",
-        "💡 Resource: Check the Academics tab! The recommended YouTube preparation video covers this step in detail."
+        "💡 Resource: Check the Academics tab! The recommended preparation guides cover this step in detail."
       ];
       const randomReply = simulatedReplies[Math.floor(Math.random() * simulatedReplies.length)];
       setAiGuideMessages(prev => [...prev, { role: 'model', message_content: randomReply }]);
@@ -2757,45 +2757,26 @@ export default function App() {
     setMentorInput('');
     setMentorLoading(true);
 
-    if (geminiApiKey.trim()) {
-      try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: `You are a helpful college freshman growth mentor. Give a concise, encouragement-focused answer under 3 sentences for: ${currentInput}` }] }]
-            })
-          }
-        );
-        const data = await response.json();
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-          const replyText = data.candidates[0].content.parts[0].text;
-          setMentorMessages(prev => [...prev, { role: 'model', message_content: replyText }]);
-        } else {
-          throw new Error("Invalid response form");
-        }
-      } catch (err) {
-        console.error("Direct Gemini API error for mentor:", err);
-        setMentorMessages(prev => [...prev, { role: 'model', message_content: "⚠️ Key verification failed. Try checking out target skill milestones in the Skills section." }]);
-      } finally {
-        setMentorLoading(false);
-      }
-      return;
-    }
-
     try {
       const res = await fetch(`${API_BASE}/mentor/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: user.id, message: currentInput })
+        body: JSON.stringify({ 
+          user_id: user?.id || "guest", 
+          message: currentInput,
+          domain_track: enrolledDomain || user?.department || "Computer Science",
+          learning_style: "Hands-on Projects"
+        })
       });
       const data = await res.json();
-      setMentorMessages(prev => [...prev, { role: 'model', message_content: data.reply }]);
+      if (data.reply) {
+        setMentorMessages(prev => [...prev, { role: 'model', message_content: data.reply }]);
+      } else {
+        throw new Error("No reply");
+      }
     } catch (err) {
       setTimeout(() => {
-        setMentorMessages(prev => [...prev, { role: 'model', message_content: "Keep up the coding drills! Try checking out target skill milestones in the Skills section." }]);
+        setMentorMessages(prev => [...prev, { role: 'model', message_content: "Keep up the practice! Check out target skill milestones in the Skills section." }]);
       }, 700);
     } finally {
       setMentorLoading(false);
