@@ -108,6 +108,22 @@ const supabaseFileName = 'db.json';
 
 let inMemoryDB = null;
 
+// Ensure Supabase Storage Bucket exists automatically
+const ensureSupabaseBucket = async () => {
+  if (!supabaseClient) return;
+  try {
+    const { data: buckets } = await supabaseClient.storage.listBuckets();
+    const exists = buckets && buckets.some(b => b.name === supabaseBucketName);
+    if (!exists) {
+      await supabaseClient.storage.createBucket(supabaseBucketName, { public: true });
+      console.log(`⚡ [SUPABASE STORAGE] Created public storage bucket: ${supabaseBucketName}`);
+    }
+  } catch (err) {
+    console.warn("Supabase storage bucket check note:", err.message);
+  }
+};
+ensureSupabaseBucket();
+
 // Asynchronous Supabase Cloud Storage & DB read/write helpers
 const readDB = async () => {
   if (inMemoryDB) return inMemoryDB;
@@ -115,6 +131,7 @@ const readDB = async () => {
   let dbData;
   if (supabaseClient) {
     try {
+      await ensureSupabaseBucket();
       const { data, error } = await supabaseClient.storage.from(supabaseBucketName).download(supabaseFileName);
       if (data && !error) {
         const text = await data.text();
@@ -156,6 +173,7 @@ const writeDB = async (data) => {
 
   if (supabaseClient) {
     try {
+      await ensureSupabaseBucket();
       const buffer = Buffer.from(content, 'utf8');
       await supabaseClient.storage.from(supabaseBucketName).upload(supabaseFileName, buffer, {
         upsert: true,
