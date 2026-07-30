@@ -2648,22 +2648,12 @@ export default function App() {
   // AI Guide (Gemini API direct query from browser or simulated fallback)
   const [aiGuideInput, setAiGuideInput] = useState('');
   const [aiGuideMessages, setAiGuideMessages] = useState([
-    { role: 'model', message_content: "Hello! I am your AI Guide. Paste your Gemini API key in settings to unlock real Gemini AI, or ask me doubts directly!" }
+    { role: 'model', message_content: "Hello! I am your AI Guide. Ask me any questions about your subjects, timetable, or skill roadmap!" }
   ]);
   const [aiGuideLoading, setAiGuideLoading] = useState(false);
-  const [geminiApiKey, setGeminiApiKey] = useState(() => safeStorage.getItem('user_gemini_api_key') || '');
-  const [showApiSettings, setShowApiSettings] = useState(false);
   const [isAiWidgetOpen, setIsAiWidgetOpen] = useState(false);
 
-  // Save API Key
-  const handleSaveApiKey = (e) => {
-    e.preventDefault();
-    safeStorage.setItem('user_gemini_api_key', geminiApiKey);
-    alert("Gemini API Key saved locally in browser memory!");
-    setShowApiSettings(false);
-  };
-
-  // AI Guide Chat handler
+  // AI Guide Chat handler - Queries server backend with permanent Supabase Cloud storage
   const handleSendAiGuideMessage = async (e) => {
     e.preventDefault();
     if (!aiGuideInput.trim()) return;
@@ -2674,40 +2664,6 @@ export default function App() {
     setAiGuideInput('');
     setAiGuideLoading(true);
 
-    // If student has saved a Gemini API key, fetch Google Gemini API directly!
-    if (geminiApiKey.trim()) {
-      try {
-        const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: `You are an expert academic college freshman counselor. Answer this student's query precisely: ${currentInput}` }] }]
-            })
-          }
-        );
-        const data = await response.json();
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-          const replyText = data.candidates[0].content.parts[0].text;
-          setAiGuideMessages(prev => [...prev, { role: 'model', message_content: replyText }]);
-        } else {
-          throw new Error("Invalid response form");
-        }
-      } catch (err) {
-        console.error("Direct Gemini API error:", err);
-        setAiGuideMessages(prev => [
-          ...prev, 
-          { role: 'model', message_content: "⚠️ API query error. Please verify your Gemini API key. Falling back to offline mode helper." }
-        ]);
-        triggerSimulatedAIAnswer(currentInput);
-      } finally {
-        setAiGuideLoading(false);
-      }
-      return;
-    }
-
-    // Query backend Gemini Chatbot API with permanent Supabase DB persistence
     try {
       const res = await fetch(`${API_BASE}/chatbot`, {
         method: 'POST',
@@ -5898,13 +5854,6 @@ export default function App() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => setShowApiSettings(!showApiSettings)} 
-                    className="p-1.5 hover:bg-white/10 rounded-lg transition-all"
-                    title="Gemini API Settings"
-                  >
-                    <Settings className="w-3.5 h-3.5 text-white" />
-                  </button>
-                  <button 
                     onClick={() => setIsAiWidgetOpen(false)}
                     className="p-1.5 hover:bg-white/10 rounded-lg transition-all text-xs font-bold"
                   >
@@ -5912,25 +5861,6 @@ export default function App() {
                   </button>
                 </div>
               </div>
-
-              {/* API Key Settings Panel */}
-              {showApiSettings && (
-                <div className="p-3 bg-slate-900 border-b border-white/5 space-y-2 shrink-0">
-                  <span className="text-[9px] text-slate-400 font-bold block">Enter Google AI Gemini API Key:</span>
-                  <form onSubmit={handleSaveApiKey} className="flex gap-2">
-                    <input
-                      type="password"
-                      placeholder="AIzaSy..."
-                      value={geminiApiKey}
-                      onChange={(e) => setGeminiApiKey(e.target.value)}
-                      className="flex-1 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 font-mono"
-                    />
-                    <button type="submit" className="btn-3d btn-3d-purple text-white font-bold text-[9px] px-3 rounded-lg shadow-md h-7 shrink-0">
-                      Save
-                    </button>
-                  </form>
-                </div>
-              )}
 
               {/* Chat Message List */}
               <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-950/80 no-scrollbar">
@@ -6013,33 +5943,22 @@ export default function App() {
               </button>
             </div>
 
-            <div className="flex-1 flex justify-center items-center bg-black/60 rounded-2xl overflow-hidden p-2 border border-white/5">
+            <div className="flex-1 flex justify-center items-center bg-black/80 rounded-2xl overflow-hidden p-3 border border-white/10 relative">
               <img 
-                src={maximizedPoster.url} 
+                src={maximizedPoster.poster_url || maximizedPoster.url} 
                 alt={maximizedPoster.title} 
-                className="max-h-[70vh] w-auto object-contain rounded-xl shadow-2xl" 
+                className="max-h-[80vh] w-auto max-w-full object-contain rounded-xl shadow-2xl transition-all duration-300 transform hover:scale-105" 
               />
             </div>
 
             <div className="flex justify-between items-center pt-2 shrink-0">
-              <span className="text-[10px] text-slate-400 font-mono font-bold">High Resolution Campus Poster View</span>
-              <div className="flex items-center gap-3">
-                <a 
-                  href={maximizedPoster.url} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="btn-3d btn-3d-sky px-4 py-2 text-xs text-white font-bold rounded-xl flex items-center gap-2 cursor-pointer"
-                >
-                  <span>Open Full Image in New Tab</span>
-                  <ChevronRight className="w-4 h-4" />
-                </a>
-                <button 
-                  onClick={() => setMaximizedPoster(null)}
-                  className="bg-white/10 hover:bg-white/20 text-slate-200 px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer"
-                >
-                  Close
-                </button>
-              </div>
+              <span className="text-[10px] text-cyan-400 font-mono font-bold">✓ High Resolution Inline View (Current Tab)</span>
+              <button 
+                onClick={() => setMaximizedPoster(null)}
+                className="btn-3d btn-3d-blue px-6 py-2 text-xs text-white font-bold rounded-xl transition-all cursor-pointer"
+              >
+                Close Maximized Image
+              </button>
             </div>
           </div>
         </div>
